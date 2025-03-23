@@ -3,9 +3,10 @@
 #include <zephyr/drivers/sensor.h>
 #include <stdio.h>
 #include <zephyr/sys/util.h>
-#include "../inc/sensors.h"
-#include "../inc/temp_queue.h"
-#include "../inc/hts221.h"
+#include "../../inc/sensors.h"
+#include "../../inc/queue.h"
+#include "../../inc/hts221.h"
+#include "../../inc/lsm6dso.h"
 
 /* Global sensor data structure */
 static sensor_data_t g_sensor_data = {
@@ -116,15 +117,15 @@ void sensors_init(void)
 {    
     printk("Initializing sensors\n");
     
-    /* For now, let's just use simulated values for testing */
-    store_sensor_reading(MSG_TYPE_TEMPERATURE, 21.5);
-    store_sensor_reading(MSG_TYPE_HUMIDITY, 45.0);
-    
     /* Initialize HTS221 temperature and humidity sensor */
     if (!my_hts221_init()) {
         printk("Failed to initialize HTS221 temperature and humidity sensor\n");
-        /* Even if sensor initialization fails, we can continue with simulated values */
     }
+    if (!my_lsm6dso_init()) {
+        printk("Failed to initialize lsm6ds0 accelerometer and gyroscope sensor\n");
+    }
+    
+
 }
 
 void sensors_run(void *p1, void *p2, void *p3)

@@ -2,7 +2,7 @@
 #define SENSORS_H
 
 #include <zephyr/kernel.h>
-#include "temp_queue.h"
+#include "queue.h"
 
 /* Maximum number of temperature readings to store */
 #define MAX_TEMP_READINGS 10

@@ -5,8 +5,8 @@
 
 #include "ui.h"
 #include "ui_helpers.h"
-#include "../inc/temp_queue.h"
-#include "../inc/sensors.h"
+#include "../../inc/queue.h"
+#include "../../inc/sensors.h"
 #include <stdio.h>
 #include <zephyr/kernel.h>
 

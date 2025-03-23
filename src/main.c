@@ -9,9 +9,9 @@
 #include <lvgl.h>
 #include <lvgl_mem.h>
 #include "ui/ui.h"
-#include "inc/sensors.h"
+#include "../inc/sensors.h"
 #include <stdio.h>
-#include "inc/temp_queue.h"
+#include "../inc/queue.h"
 
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>

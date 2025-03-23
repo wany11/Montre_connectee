@@ -6,7 +6,13 @@
 /* Define message types */
 typedef enum {
     MSG_TYPE_TEMPERATURE,
-    MSG_TYPE_HUMIDITY
+    MSG_TYPE_HUMIDITY,
+    MSG_TYPE_ACCEL_X,
+    MSG_TYPE_ACCEL_Y,
+    MSG_TYPE_ACCEL_Z,
+    MSG_TYPE_GYRO_X,
+    MSG_TYPE_GYRO_Y,
+    MSG_TYPE_GYRO_Z,
 } sensor_msg_type_t;
 
 /* Message structure to hold both value and type */

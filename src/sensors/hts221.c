@@ -3,8 +3,8 @@
 #include <zephyr/drivers/sensor.h>
 #include <stdio.h>
 #include <zephyr/sys/util.h>
-#include "../inc/sensors.h"
-#include "../inc/temp_queue.h"
+#include "../../inc/sensors.h"
+#include "../../inc/queue.h"
 
 static const struct device *hts221_dev = NULL;
 
