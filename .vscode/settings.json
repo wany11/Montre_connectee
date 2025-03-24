@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "kernel.h": "c",
-        "sensor.h": "c"
+        "sensor.h": "c",
+        "util.h": "c",
+        "device.h": "c"
     }
 }

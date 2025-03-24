@@ -55,7 +55,7 @@ void process_queue(void)
     char humidity_str[32];
     bool temp_updated = false;
     bool humidity_updated = false;
-    struct k_msgq *temp_msgq = get_temp_msgq();
+    struct k_msgq *temp_msgq = get_msgq();
     
     if (temp_msgq == NULL) {
         return;

@@ -7,6 +7,7 @@
 #include "../../inc/queue.h"
 #include "../../inc/hts221.h"
 #include "../../inc/lsm6dso.h"
+#include "../../inc/lis2mdl.h"
 
 /* Global sensor data structure */
 static sensor_data_t g_sensor_data = {
@@ -59,7 +60,7 @@ void store_sensor_reading(sensor_msg_type_t type, double value)
     }
     
     /* Send to message queue */
-    struct k_msgq *msgq = get_temp_msgq();
+    struct k_msgq *msgq = get_msgq();
     if (msgq != NULL) {
         sensor_msg_t msg = {
             .type = type,
@@ -124,8 +125,9 @@ void sensors_init(void)
     if (!my_lsm6dso_init()) {
         printk("Failed to initialize lsm6ds0 accelerometer and gyroscope sensor\n");
     }
-    
-
+    if (!my_lis2mdl_init()) {
+        printk("Failed to initialize lsm6ds0 accelerometer and gyroscope sensor\n");
+    }
 }
 
 void sensors_run(void *p1, void *p2, void *p3)
@@ -149,7 +151,8 @@ void sensors_run(void *p1, void *p2, void *p3)
     while (1) {
         /* Poll both sensors */
         hts221_sample();
-        
+        lis2mdl_sample();
+        lsm6dso_sample();
         /* Poll once per second */
         k_sleep(K_SECONDS(1));
     }

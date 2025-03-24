@@ -13,6 +13,9 @@ typedef enum {
     MSG_TYPE_GYRO_X,
     MSG_TYPE_GYRO_Y,
     MSG_TYPE_GYRO_Z,
+    MSG_TYPE_MAG_X,
+    MSG_TYPE_MAG_Y,
+    MSG_TYPE_MAG_Z,
 } sensor_msg_type_t;
 
 /* Message structure to hold both value and type */
@@ -26,6 +29,6 @@ typedef struct {
  * 
  * @return Pointer to the sensor message queue
  */
-struct k_msgq *get_temp_msgq(void);
+struct k_msgq *get_msgq(void);
 
 #endif /* TEMP_QUEUE_H */
