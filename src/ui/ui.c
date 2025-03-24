@@ -93,7 +93,7 @@ void process_queue(void)
     }
     
     /* Alternative approach: directly access the sensor values */
-    double temperature, humidity;
+    double temperature, humidity = 0;
     
     /* Get latest temperature and update UI if available */
     if (!temp_updated && get_latest_temperature(&temperature) && ui_LabelTemp != NULL) {

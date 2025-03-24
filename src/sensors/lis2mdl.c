@@ -10,7 +10,7 @@
 #include <zephyr/drivers/sensor.h>
 #include "../../inc/sensors.h"
 #include "../../inc/queue.h"
-
+#include "../../inc/debug.h"  /* Include the debug header */
 
 static const struct device *lis2mdl_dev = NULL;
 
@@ -22,7 +22,7 @@ static inline float out_ev(struct sensor_value *val)
 static void lis2mdl_process_sample(const struct device *dev)
 {
     if (dev == NULL) {
-        printk("lis2mdl device is NULL, using simulated values\n");
+        LIS2MDL_INFO("Device is NULL, using simulated values\n");
         /* Use simulated values for magnetometer */
         store_sensor_reading(MSG_TYPE_MAG_X, 0.0);
         store_sensor_reading(MSG_TYPE_MAG_Y, 0.0);
@@ -35,7 +35,7 @@ static void lis2mdl_process_sample(const struct device *dev)
 
     /* lis2mdl magnetometer */
     if (sensor_sample_fetch_chan(dev, SENSOR_CHAN_MAGN_XYZ) < 0) {
-        printk("lis2mdl magnetometer fetch error\n");
+        LIS2MDL_ERROR("Magnetometer fetch error\n");
         return;
     }
     
@@ -51,10 +51,10 @@ static void lis2mdl_process_sample(const struct device *dev)
     store_sensor_reading(MSG_TYPE_MAG_Y, mag_y);
     store_sensor_reading(MSG_TYPE_MAG_Z, mag_z);
 
-    printk("Magnetic field x:%f uT y:%f uT z:%f uT\n", mag_x, mag_y, mag_z);
+    LIS2MDL_VERBOSE("Magnetic field x:%.2f uT y:%.2f uT z:%.2f uT\n", mag_x, mag_y, mag_z);
 
     ++obs;
-    printk("lis2mdl Observation: %u\n\n", obs);
+    LIS2MDL_VERBOSE("Observation: %u\n", obs);
 }
 
 static int set_sampling_freq(const struct device *dev)
@@ -66,10 +66,11 @@ static int set_sampling_freq(const struct device *dev)
     odr_attr.val1 = 10;
     odr_attr.val2 = 0;
 
+    LIS2MDL_INFO("Setting sampling frequency to %d Hz\n", odr_attr.val1);
     ret = sensor_attr_set(dev, SENSOR_CHAN_MAGN_XYZ,
             SENSOR_ATTR_SAMPLING_FREQUENCY, &odr_attr);
     if (ret != 0) {
-        printk("Cannot set sampling frequency for magnetometer.\n");
+        LIS2MDL_ERROR("Cannot set sampling frequency for magnetometer (err: %d)\n", ret);
         return ret;
     }
 
@@ -79,59 +80,62 @@ static int set_sampling_freq(const struct device *dev)
 static void lis2mdl_handler(const struct device *dev,
                const struct sensor_trigger *trig)
 {
+    LIS2MDL_VERBOSE("Trigger handler called\n");
     lis2mdl_process_sample(dev);
 }
 
 bool my_lis2mdl_init(void)
 {
-    printk("Starting lis2mdl initialization\n");
+    LIS2MDL_INFO("Starting initialization\n");
 
     /* Try to get the lis2mdl device */
     lis2mdl_dev = DEVICE_DT_GET_ANY(st_lis2mdl);
     
     if (lis2mdl_dev == NULL) {
-        printk("Could not find lis2mdl with DEVICE_DT_GET_ANY\n");
+        LIS2MDL_VERBOSE("Could not find device with DEVICE_DT_GET_ANY\n");
         
         /* Try alternate method */
         lis2mdl_dev = device_get_binding("LIS2MDL");
         
         if (lis2mdl_dev == NULL) {
-            printk("lis2mdl sensor: device not found.\n");
+            LIS2MDL_ERROR("Sensor not found\n");
             return false;
         }
     }
     
     if (!device_is_ready(lis2mdl_dev)) {
-        printk("lis2mdl sensor: device not ready.\n");
+        LIS2MDL_ERROR("Sensor not ready\n");
         lis2mdl_dev = NULL;
         return false;
     }
 
-    printk("lis2mdl device found and ready\n");
+    LIS2MDL_INFO("Device found and ready\n");
 
     if (set_sampling_freq(lis2mdl_dev) != 0) {
-        printk("Failed to set sampling frequency\n");
+        LIS2MDL_ERROR("Failed to set sampling frequency\n");
         return false;
     }
 
 #ifdef CONFIG_LIS2MDL_TRIGGER
-    printk("Setting up lis2mdl trigger\n");
+    LIS2MDL_INFO("Setting up trigger\n");
     struct sensor_trigger trig = {
         .type = SENSOR_TRIG_DATA_READY,
         .chan = SENSOR_CHAN_MAGN_XYZ,
     };
     if (sensor_trigger_set(lis2mdl_dev, &trig, lis2mdl_handler) < 0) {
-        printk("Cannot configure lis2mdl trigger\n");
+        LIS2MDL_ERROR("Cannot configure trigger\n");
         return false;
     }
+    LIS2MDL_INFO("Trigger configured successfully\n");
 #endif
     
-    printk("lis2mdl magnetometer initialized successfully\n");
+    LIS2MDL_INFO("Magnetometer initialized successfully\n");
     return true;
 }
 
 void lis2mdl_sample(void)
 {
+    LIS2MDL_VERBOSE("Taking sample\n");
     /* Process the sample with the current device (even if it's NULL,
        the function will handle that case and use simulated values) */
     lis2mdl_process_sample(lis2mdl_dev);
