@@ -1,11 +1,18 @@
 #include "../../inc/timSec.h"
 
-static uint32_t temps = 0; // Variable to store the time in seconds
+static uint32_t temps = 43200; // Variable to store the time in seconds
 
 /* Timer callback function */
 static void timer_handler(struct k_timer *dummy)
 {
-    temps++;
+    if(temps == 86399) // Si on atteint 23:59:59
+    {
+        temps = 0; // Remettre à 0
+    }
+    else
+    {
+        temps++;
+    }
 }
 
 /* Zephyr timer definition */
@@ -25,7 +32,7 @@ uint32_t get_temps(void)
 
 void format_time(uint32_t seconds, char *buffer, size_t buffer_size)
 {
-    uint32_t hours = (seconds / 3600) % 24; // Convertir en heures (remise à 0 après 24h)
+    uint32_t hours = (seconds / 3600); // Convertir en heures (remise à 0 après 24h)
     uint32_t minutes = (seconds / 60) % 60; // Convertir en minutes
     uint32_t secs = seconds % 60;           // Récupérer les secondes restantes
 
