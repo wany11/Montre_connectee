@@ -12,6 +12,7 @@
 #include "../inc/sensors.h"
 #include <stdio.h>
 #include "../inc/queue.h"
+#include "../inc/timSec.h"
 
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>
@@ -76,6 +77,10 @@ int main(void)
     /* Signal that UI is ready for sensors to start */
     k_sem_give(&ui_ready_sem);
     printk("UI ready semaphore given\n");
+
+    /* Start the timer */
+    start_timer();
+    printk("Timer started\n");
 
     /* Main thread handles display updates */
     while (1) {

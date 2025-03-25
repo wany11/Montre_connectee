@@ -22,8 +22,17 @@ extern "C" {
 void ui_Screen1_screen_init(void);
 extern lv_obj_t * ui_Screen1;
 extern lv_obj_t * ui_Image1;
+extern lv_obj_t * ui_HourLabel;
 extern lv_obj_t * ui_LabelSensor;
 extern lv_obj_t * ui_LabelTemp;
+extern lv_obj_t * ui_Label4;
+extern lv_obj_t * ui_Label5;
+extern lv_obj_t * ui_Label6;
+extern lv_obj_t * ui_Label7;
+extern lv_obj_t * ui_Label8;
+extern lv_obj_t * ui_Label9;
+extern lv_obj_t * ui_Label10;
+extern lv_obj_t * ui_Label11;
 // CUSTOM VARIABLES
 
 // EVENTS

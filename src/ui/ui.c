@@ -9,6 +9,7 @@
 #include "../../inc/sensors.h"
 #include <stdio.h>
 #include <zephyr/kernel.h>
+#include "../../inc/timSec.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -16,8 +17,17 @@
 void ui_Screen1_screen_init(void);
 lv_obj_t * ui_Screen1;
 lv_obj_t * ui_Image1;
+lv_obj_t * ui_HourLabel;
 lv_obj_t * ui_LabelSensor;
 lv_obj_t * ui_LabelTemp;
+lv_obj_t * ui_Label4;
+lv_obj_t * ui_Label5;
+lv_obj_t * ui_Label6;
+lv_obj_t * ui_Label7;
+lv_obj_t * ui_Label8;
+lv_obj_t * ui_Label9;
+lv_obj_t * ui_Label10;
+lv_obj_t * ui_Label11;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -138,11 +148,21 @@ void ui_thread_entry(void *p1, void *p2, void *p3)
         lv_label_set_text(ui_LabelSensor, "Humidity: --.-%");
     }
     
+    if (ui_HourLabel != NULL) {
+        lv_label_set_text(ui_HourLabel, "00:00:00");
+    }
+
     while (1) {
         /* Process sensor data from queue */
         process_queue();
         
-        /* Sleep for a short time */
-        k_sleep(K_MSEC(100));
+        if (ui_HourLabel != NULL) {
+            char time_str[32];
+            format_time(get_temps(), time_str, sizeof(time_str)); // Convertir temps en hh:mm:ss
+            lv_label_set_text(ui_HourLabel, time_str);
+        }
+
+        /* Sleep for a short time (1 sec) */
+        k_sleep(K_SECONDS(1));
     }
 }
