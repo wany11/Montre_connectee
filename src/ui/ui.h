@@ -25,14 +25,15 @@ extern lv_obj_t * ui_Image1;
 extern lv_obj_t * ui_HourLabel;
 extern lv_obj_t * ui_LabelSensor;
 extern lv_obj_t * ui_LabelTemp;
-extern lv_obj_t * ui_Label4;
-extern lv_obj_t * ui_Label5;
-extern lv_obj_t * ui_Label6;
-extern lv_obj_t * ui_Label7;
-extern lv_obj_t * ui_Label8;
-extern lv_obj_t * ui_Label9;
-extern lv_obj_t * ui_Label10;
-extern lv_obj_t * ui_Label11;
+extern lv_obj_t * ui_accel_x;
+extern lv_obj_t * ui_accel_y;
+extern lv_obj_t * ui_accel_z;
+extern lv_obj_t * ui_gyro_x;
+extern lv_obj_t * ui_gyro_y;
+extern lv_obj_t * ui_gyro_z;
+extern lv_obj_t * ui_mag_x;
+extern lv_obj_t * ui_mag_y;
+extern lv_obj_t * ui_mag_z;
 // CUSTOM VARIABLES
 
 // EVENTS

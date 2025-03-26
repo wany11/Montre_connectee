@@ -20,14 +20,15 @@ lv_obj_t * ui_Image1;
 lv_obj_t * ui_HourLabel;
 lv_obj_t * ui_LabelSensor;
 lv_obj_t * ui_LabelTemp;
-lv_obj_t * ui_Label4;
-lv_obj_t * ui_Label5;
-lv_obj_t * ui_Label6;
-lv_obj_t * ui_Label7;
-lv_obj_t * ui_Label8;
-lv_obj_t * ui_Label9;
-lv_obj_t * ui_Label10;
-lv_obj_t * ui_Label11;
+lv_obj_t * ui_accel_x;
+lv_obj_t * ui_accel_y;
+lv_obj_t * ui_accel_z;
+lv_obj_t * ui_gyro_x;
+lv_obj_t * ui_gyro_y;
+lv_obj_t * ui_gyro_z;
+lv_obj_t * ui_mag_x;
+lv_obj_t * ui_mag_y;
+lv_obj_t * ui_mag_z;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -63,8 +64,26 @@ void process_queue(void)
     sensor_msg_t msg;
     char temp_str[32];
     char humidity_str[32];
+    char accel_x_str[32];
+    char accel_y_str[32];
+    char accel_z_str[32];
+    char gyro_x_str[32];
+    char gyro_y_str[32];
+    char gyro_z_str[32];
+    char mag_x_str[32];
+    char mag_y_str[32];
+    char mag_z_str[32];
     bool temp_updated = false;
     bool humidity_updated = false;
+    bool accel_x_updated = false;
+    bool accel_y_updated = false;
+    bool accel_z_updated = false;
+    bool gyro_x_updated = false;
+    bool gyro_y_updated = false;
+    bool gyro_z_updated = false;
+    bool mag_x_updated = false;
+    bool mag_y_updated = false;
+    bool mag_z_updated = false;
     struct k_msgq *temp_msgq = get_msgq();
     
     if (temp_msgq == NULL) {
@@ -85,7 +104,61 @@ void process_queue(void)
             snprintf(humidity_str, sizeof(humidity_str), "Humidity: %.1f%%", msg.value);
             humidity_updated = true;
             break;
-            
+
+        case MSG_TYPE_ACCEL_X:
+            /* Update accelerometer X string */
+            snprintf(accel_x_str, sizeof(accel_x_str), "Accel X: %.2f", msg.value);
+            accel_x_updated = true;
+            break;
+
+        case MSG_TYPE_ACCEL_Y:
+            /* Update accelerometer Y string */
+            snprintf(accel_y_str, sizeof(accel_y_str), "Accel Y: %.2f", msg.value);
+            accel_y_updated = true;
+            break;
+
+        case MSG_TYPE_ACCEL_Z:
+            /* Update accelerometer Z string */
+            snprintf(accel_z_str, sizeof(accel_z_str), "Accel Z: %.2f", msg.value);
+            accel_z_updated = true;
+            break;
+
+        case MSG_TYPE_GYRO_X:
+            /* Update gyroscope X string */
+            snprintf(gyro_x_str, sizeof(gyro_x_str), "Gyro X: %.2f", msg.value);
+            gyro_x_updated = true;
+            break;
+
+        case MSG_TYPE_GYRO_Y:
+            /* Update gyroscope Y string */
+            snprintf(gyro_y_str, sizeof(gyro_y_str), "Gyro Y: %.2f", msg.value);
+            gyro_y_updated = true;
+            break;
+
+        case MSG_TYPE_GYRO_Z:
+            /* Update gyroscope Z string */
+            snprintf(gyro_z_str, sizeof(gyro_z_str), "Gyro Z: %.2f", msg.value);
+            gyro_z_updated = true;
+            break;
+
+        case MSG_TYPE_MAG_X:
+            /* Update magnetometer X string */
+            snprintf(mag_x_str, sizeof(mag_x_str), "Mag X: %.2f", msg.value);
+            mag_x_updated = true;
+            break;
+
+        case MSG_TYPE_MAG_Y:
+            /* Update magnetometer Y string */
+            snprintf(mag_y_str, sizeof(mag_y_str), "Mag Y: %.2f", msg.value);
+            mag_y_updated = true;
+            break;
+
+        case MSG_TYPE_MAG_Z:
+            /* Update magnetometer Z string */
+            snprintf(mag_z_str, sizeof(mag_z_str), "Mag Z: %.2f", msg.value);
+            mag_z_updated = true;
+            break;
+
         default:
             /* Unknown message type */
             break;
@@ -101,20 +174,50 @@ void process_queue(void)
     if (humidity_updated && ui_LabelSensor != NULL) {
         lv_label_set_text(ui_LabelSensor, humidity_str);
     }
-    
-    /* Alternative approach: directly access the sensor values */
-    double temperature, humidity = 0;
-    
-    /* Get latest temperature and update UI if available */
-    if (!temp_updated && get_latest_temperature(&temperature) && ui_LabelTemp != NULL) {
-        snprintf(temp_str, sizeof(temp_str), "Temperature: %.1f °C", temperature);
-        lv_label_set_text(ui_LabelTemp, temp_str);
+
+    /* Update the accelerometer X label if new data is available */
+    if (accel_x_updated && ui_accel_x != NULL) {
+        lv_label_set_text(ui_accel_x, accel_x_str);
     }
-    
-    /* Get latest humidity and update UI if available */
-    if (!humidity_updated && get_latest_humidity(&humidity) && ui_LabelSensor != NULL) {
-        snprintf(humidity_str, sizeof(humidity_str), "Humidity: %.1f%%", humidity);
-        lv_label_set_text(ui_LabelSensor, humidity_str);
+
+    /* Update the accelerometer Y label if new data is available */
+    if (accel_y_updated && ui_accel_y != NULL) {
+        lv_label_set_text(ui_accel_y, accel_y_str);
+    }
+
+    /* Update the accelerometer Z label if new data is available */
+    if (accel_z_updated && ui_accel_z != NULL) {
+        lv_label_set_text(ui_accel_z, accel_z_str);
+    }
+
+    /* Update the gyroscope X label if new data is available */
+    if (gyro_x_updated && ui_gyro_x != NULL) {
+        lv_label_set_text(ui_gyro_x, gyro_x_str);
+    }
+
+    /* Update the gyroscope Y label if new data is available */
+    if (gyro_y_updated && ui_gyro_y != NULL) {
+        lv_label_set_text(ui_gyro_y, gyro_y_str);
+    }
+
+    /* Update the gyroscope Z label if new data is available */
+    if (gyro_z_updated && ui_gyro_z != NULL) {
+        lv_label_set_text(ui_gyro_z, gyro_z_str);
+    }
+
+    /* Update the magnetometer X label if new data is available */
+    if (mag_x_updated && ui_mag_x != NULL) {
+        lv_label_set_text(ui_mag_x, mag_x_str);
+    }
+
+    /* Update the magnetometer Y label if new data is available */
+    if (mag_y_updated && ui_mag_y != NULL) {
+        lv_label_set_text(ui_mag_y, mag_y_str);
+    }
+
+    /* Update the magnetometer Z label if new data is available */
+    if (mag_z_updated && ui_mag_z != NULL) {
+        lv_label_set_text(ui_mag_z, mag_z_str);
     }
 }
 
