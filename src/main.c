@@ -13,10 +13,14 @@
 #include <stdio.h>
 #include "../inc/queue.h"
 #include "../inc/timSec.h"
+#include "../inc/debug.h"
+#include "../inc/button.h"
 
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(app);
+
+
 /* Thread stacks */
 #define UI_THREAD_STACK_SIZE 2048
 #define SENSOR_THREAD_STACK_SIZE 4096
@@ -45,38 +49,44 @@ struct k_msgq* get_msgq(void)
 
 int main(void)
 {
-    printk("Main function started\n");
+    MAIN_INFO("Main function started\n");
     const struct device *display_dev;
 
     display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
     if (!device_is_ready(display_dev)) {
-        LOG_ERR("Display device not ready, aborting test");
+        MAIN_ERROR("Display device not ready, aborting test\n");
         return 0;
     }
-    printk("Display device is ready\n");
+    MAIN_INFO("Display device is ready\n");
+
+    /* Initialize button handler */
+    if (button_init(display_dev) != 0) {
+        MAIN_ERROR("Button initialization failed\n");
+        /* Continue anyway, as this is not critical */
+    }
 
     /* Initialize UI */
     ui_init();
-    printk("UI initialized\n");
+    MAIN_INFO("UI initialized\n");
     
     display_blanking_off(display_dev);
 
 #ifdef CONFIG_LV_Z_MEM_POOL_SYS_HEAP
     lvgl_print_heap_info(false);
 #else
-    printf("lvgl in malloc mode\n");
+    MAIN_INFO("LVGL in malloc mode\n");
 #endif
 
-    printk("UI thread started\n");
+    MAIN_INFO("UI thread started\n");
     
     /* Wait a moment to ensure UI thread has started */
     k_sleep(K_MSEC(500));
 
-    printk("Sensor thread scheduled to start\n");
+    MAIN_INFO("Sensor thread scheduled to start\n");
 
     /* Signal that UI is ready for sensors to start */
     k_sem_give(&ui_ready_sem);
-    printk("UI ready semaphore given\n");
+    MAIN_INFO("UI ready semaphore given\n");
 
     /* Start the timer */
     start_timer();

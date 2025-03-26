@@ -52,4 +52,12 @@
 #define LSM6DSO_INFO(fmt, ...)    DEBUG_INFO_PRINT("LSM6DSO", fmt, ##__VA_ARGS__)
 #define LSM6DSO_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("LSM6DSO", fmt, ##__VA_ARGS__)
 
+#define MAIN_ERROR(fmt, ...)   DEBUG_ERROR_PRINT("MAIN", fmt, ##__VA_ARGS__)
+#define MAIN_INFO(fmt, ...)    DEBUG_INFO_PRINT("MAIN", fmt, ##__VA_ARGS__)
+#define MAIN_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("MAIN", fmt, ##__VA_ARGS__)
+
+#define BUTTON_ERROR(fmt, ...)   DEBUG_ERROR_PRINT("BUTTON", fmt, ##__VA_ARGS__)
+#define BUTTON_INFO(fmt, ...)    DEBUG_INFO_PRINT("BUTTON", fmt, ##__VA_ARGS__)
+#define BUTTON_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("BUTTON", fmt, ##__VA_ARGS__)
+
 #endif /* DEBUG_H_ */
