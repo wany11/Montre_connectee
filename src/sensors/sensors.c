@@ -26,6 +26,69 @@ static double latest_humidity = 0.0;
 /* Semaphore for UI readiness - declared in main.c */
 extern struct k_sem ui_ready_sem;
 
+static struct k_sem hts221_sem;
+static struct k_sem lis2mdl_sem;
+static struct k_sem lsm6dso_sem;
+
+/* Define thread stacks */
+#define STACK_SIZE 1024
+K_THREAD_STACK_DEFINE(hts221_stack, STACK_SIZE);
+K_THREAD_STACK_DEFINE(lis2mdl_stack, STACK_SIZE);
+K_THREAD_STACK_DEFINE(lsm6dso_stack, STACK_SIZE);
+
+/* Thread data structures */
+static struct k_thread hts221_thread_data;
+static struct k_thread lis2mdl_thread_data;
+static struct k_thread lsm6dso_thread_data;
+
+/* Thread IDs */
+static k_tid_t hts221_tid;
+static k_tid_t lis2mdl_tid;
+static k_tid_t lsm6dso_tid;
+
+/* Thread functions */
+static void hts221_thread_func(void *p1, void *p2, void *p3)
+{
+    while (1) {
+        SENSORS_VERBOSE("Starting HTS221 sampling\n");
+        hts221_sample();
+        
+        /* Signal that sampling is complete */
+        k_sem_give(&hts221_sem);
+        SENSORS_VERBOSE("HTS221 sampling complete\n");
+    }
+}
+
+static void lis2mdl_thread_func(void *p1, void *p2, void *p3)
+{
+    while (1) {
+        /* Wait for HTS221 to complete */
+        k_sem_take(&hts221_sem, K_FOREVER);
+        
+        SENSORS_VERBOSE("Starting LIS2MDL sampling\n");
+        lis2mdl_sample();
+        
+        /* Signal that sampling is complete */
+        k_sem_give(&lis2mdl_sem);
+        SENSORS_VERBOSE("LIS2MDL sampling complete\n");
+    }
+}
+
+static void lsm6dso_thread_func(void *p1, void *p2, void *p3)
+{
+    while (1) {
+        /* Wait for LIS2MDL to complete */
+        k_sem_take(&lis2mdl_sem, K_FOREVER);
+        
+        SENSORS_VERBOSE("Starting LSM6DSO sampling\n");
+        lsm6dso_sample();
+        
+        /* Signal that sampling is complete */
+        k_sem_give(&lsm6dso_sem);
+        SENSORS_VERBOSE("LSM6DSO sampling complete\n");
+    }
+}
+
 void store_sensor_reading(sensor_msg_type_t type, double value)
 {
     /* Handle reading based on sensor type */
@@ -99,11 +162,19 @@ void store_sensor_reading(sensor_msg_type_t type, double value)
         
         /* Non-blocking send - if queue is full, we'll just skip this update */
         int ret = k_msgq_put(msgq, &msg, K_NO_WAIT);
-        if (ret == 0) {
-            SENSORS_VERBOSE("Message sent to queue: type=%d, value=%.2f\n", type, value);
-        } else {
-            SENSORS_ERROR("Failed to send message to queue: %d\n", ret);
+        if (ret != 0) {
+            SENSORS_VERBOSE("Queue full, purging oldest message\n");
+            k_msgq_purge(msgq); // Clear the queue
+            ret = k_msgq_put(msgq, &msg, K_NO_WAIT); // Try again
+            if (ret != 0) {
+                SENSORS_ERROR("Failed to send message to queue even after purge: %d\n", ret);
+            }
         }
+        // if (ret == 0) {
+        //     SENSORS_VERBOSE("Message sent to queue: type=%d, value=%.2f\n", type, value);
+        // } else {
+        //     SENSORS_ERROR("Failed to send message to queue: %d\n", ret);
+        // }
     } else {
         SENSORS_ERROR("Message queue not available\n");
     }
@@ -163,6 +234,11 @@ void sensors_init(void)
 {    
     SENSORS_INFO("Initializing sensors\n");
     
+    /* Initialize semaphores for sensor synchronization */
+    k_sem_init(&hts221_sem, 0, 1);
+    k_sem_init(&lis2mdl_sem, 0, 1);
+    k_sem_init(&lsm6dso_sem, 0, 1);
+    
     /* Initialize HTS221 temperature and humidity sensor */
     if (!my_hts221_init()) {
         SENSORS_ERROR("Failed to initialize HTS221 temperature and humidity sensor\n");
@@ -181,8 +257,22 @@ void sensors_init(void)
     } else {
         SENSORS_INFO("LIS2MDL initialized successfully\n");
     }
+    
+    /* Create sensor threads */
+    hts221_tid = k_thread_create(&hts221_thread_data, hts221_stack, STACK_SIZE,
+                                hts221_thread_func, NULL, NULL, NULL,
+                                5, 0, K_NO_WAIT);
+    
+    lis2mdl_tid = k_thread_create(&lis2mdl_thread_data, lis2mdl_stack, STACK_SIZE,
+                                 lis2mdl_thread_func, NULL, NULL, NULL,
+                                 5, 0, K_NO_WAIT);
+                                 
+    lsm6dso_tid = k_thread_create(&lsm6dso_thread_data, lsm6dso_stack, STACK_SIZE,
+                                 lsm6dso_thread_func, NULL, NULL, NULL,
+                                 5, 0, K_NO_WAIT);
 }
 
+/* Modified sensors_run to monitor threads instead of executing them */
 void sensors_run(void *p1, void *p2, void *p3)
 {
     SENSORS_INFO("Starting sensors thread\n");
@@ -195,21 +285,16 @@ void sensors_run(void *p1, void *p2, void *p3)
         SENSORS_INFO("UI ready semaphore taken, initializing sensors\n");
     }
     
-    /* Initialize sensors */
+    /* Initialize sensors and start threads */
     sensors_init();
     
     SENSORS_INFO("Sensors initialized successfully\n");
     
-    /* Run sensor loop */
+    /* Main thread can now monitor or do other work */
     while (1) {
-        /* Poll all sensors */
-        SENSORS_VERBOSE("Polling sensors\n");
-        
-        hts221_sample();
-        lis2mdl_sample();
-        lsm6dso_sample();
-        
-        /* Poll once per second */
-        k_sleep(K_SECONDS(1));
+        /* Monitor for completion of full cycle */
+        k_sem_take(&lsm6dso_sem, K_FOREVER);
+        SENSORS_VERBOSE("Complete sensor cycle finished\n");
+        k_sleep(K_MSEC(200));
     }
 }
