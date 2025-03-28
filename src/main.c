@@ -15,6 +15,7 @@
 #include "../inc/timSec.h"
 #include "../inc/debug.h"
 #include "../inc/button.h"
+#include "../inc/bluetooth.h"
 
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>
@@ -41,6 +42,9 @@ K_THREAD_DEFINE(ui_thread_id, UI_THREAD_STACK_SIZE, ui_thread_entry, NULL, NULL,
                 
 K_THREAD_DEFINE(sensor_thread_id, SENSOR_THREAD_STACK_SIZE, sensors_run, NULL, NULL, NULL,
                 SENSOR_THREAD_PRIORITY, 0, 500);
+
+K_THREAD_DEFINE(bluetooth_thread_id, SENSOR_THREAD_STACK_SIZE, launchBLE, NULL, NULL, NULL,
+                SENSOR_THREAD_PRIORITY, 0, 1000);
 
 struct k_msgq* get_msgq(void)
 {
