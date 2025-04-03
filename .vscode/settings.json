@@ -3,6 +3,8 @@
         "kernel.h": "c",
         "sensor.h": "c",
         "util.h": "c",
-        "device.h": "c"
+        "device.h": "c",
+        "debug.h": "c",
+        "sensors.h": "c"
     }
 }

@@ -43,7 +43,7 @@ K_THREAD_DEFINE(ui_thread_id, UI_THREAD_STACK_SIZE, ui_thread_entry, NULL, NULL,
 K_THREAD_DEFINE(sensor_thread_id, SENSOR_THREAD_STACK_SIZE, sensors_run, NULL, NULL, NULL,
                 SENSOR_THREAD_PRIORITY, 0, 500);
 
-K_THREAD_DEFINE(bluetooth_thread_id, SENSOR_THREAD_STACK_SIZE, launchBLE, NULL, NULL, NULL,
+K_THREAD_DEFINE(bluetooth_thread_id, SENSOR_THREAD_STACK_SIZE, bluetooth_run, NULL, NULL, NULL,
                 SENSOR_THREAD_PRIORITY, 0, 1000);
 
 struct k_msgq* get_msgq(void)

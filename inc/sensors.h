@@ -2,23 +2,22 @@
 #define SENSORS_H
 
 #include <zephyr/kernel.h>
+#include <stdbool.h>
 #include "queue.h"
-
-/* Maximum number of temperature readings to store */
-#define MAX_TEMP_READINGS 10
-
-/* Temperature reading structure */
-typedef struct {
-    double temperature;
-    uint32_t timestamp;
-} temp_reading_t;
 
 /* Sensor data structure */
 typedef struct {
-    temp_reading_t readings[MAX_TEMP_READINGS];
-    uint32_t count;
-    uint32_t max_count;
-    bool overflow;
+    double temperature;  /* Temperature reading */
+    double humidity;     /* Humidity reading */
+    double accel_x;      /* Accelerometer X-axis reading */
+    double accel_y;      /* Accelerometer Y-axis reading */
+    double accel_z;      /* Accelerometer Z-axis reading */
+    double gyro_x;       /* Gyroscope X-axis reading */
+    double gyro_y;       /* Gyroscope Y-axis reading */
+    double gyro_z;       /* Gyroscope Z-axis reading */
+    double mag_x;        /* Magnetometer X-axis reading */
+    double mag_y;        /* Magnetometer Y-axis reading */
+    double mag_z;        /* Magnetometer Z-axis reading */
 } sensor_data_t;
 
 /**
@@ -37,42 +36,7 @@ void store_sensor_reading(sensor_msg_type_t type, double value);
 void store_reading(double temperature);
 
 /**
- * @brief Set the latest humidity reading (backward compatibility)
- * 
- * @param humidity Humidity value to store
- */
-void set_latest_humidity(double humidity);
-
-/**
- * @brief Get the latest temperature reading
- * 
- * @param temperature Pointer to store the temperature value
- * @return true if successful, false otherwise
- */
-bool get_latest_temperature(double *temperature);
-
-/**
- * @brief Get the latest humidity reading
- * 
- * @param humidity Pointer to store the humidity value
- * @return true if successful, false otherwise
- */
-bool get_latest_humidity(double *humidity);
-
-/**
- * @brief Get the sensor data structure
- * 
- * @return Pointer to the sensor data structure
- */
-const sensor_data_t* get_sensor_data(void);
-
-/**
- * @brief Clear the sensor data
- */
-void clear_sensor_data(void);
-
-/**
- * @brief Initialize the sensors
+ * @brief Initialize all sensors
  */
 void sensors_init(void);
 
@@ -81,8 +45,16 @@ void sensors_init(void);
  */
 void sensors_run(void *p1, void *p2, void *p3);
 
-/* Sensor interface functions */
+/* HTS221 temperature and humidity sensor interface */
 bool my_hts221_init(void);
 void hts221_sample(void);
+
+/* LSM6DSO accelerometer and gyroscope sensor interface */
+bool my_lsm6dso_init(void);
+void lsm6dso_sample(void);
+
+/* LIS2MDL magnetometer sensor interface */
+bool my_lis2mdl_init(void);
+void lis2mdl_sample(void);
 
 #endif /* SENSORS_H */

@@ -1,9 +1,12 @@
 /**
  * @file bluetooth.h
- * @brief Bluetooth functionality for Montre_connectee
+ * @brief Bluetooth functionality for sensor data service
  *
- * This header file provides the interface for the Bluetooth functionality
- * of the connected watch application.
+ * This file contains declarations for Bluetooth functionality 
+ * that provides a sensor data service for the connected device.
+ *
+ * Copyright (c) 2023 Nordic Semiconductor ASA
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
 #ifndef BLUETOOTH_H_
@@ -14,14 +17,13 @@ extern "C" {
 #endif
 
 /**
- * @brief Initialize and launch Bluetooth functionality
- * 
- * This function initializes the Bluetooth stack, starts advertising,
- * and enters the main Bluetooth processing loop.
+ * @brief Initialize and run Bluetooth functionality
  *
- * @return 0 on success, negative error code otherwise
+ * This function initializes the Bluetooth stack, starts advertising,
+ * and handles connections and sensor data notifications. It includes
+ * a non-returning loop that continuously processes Bluetooth events.
  */
-int launchBLE(void);
+void bluetooth_run(void);
 
 #ifdef __cplusplus
 }

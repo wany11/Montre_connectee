@@ -11,17 +11,19 @@
 #include "../../inc/debug.h"  /* Include the debug header */
 
 /* Global sensor data structure */
-static sensor_data_t g_sensor_data = {
-    .count = 0,
-    .max_count = MAX_TEMP_READINGS,
-    .overflow = false
+extern sensor_data_t g_sensor_data = {
+    .accel_x = 0.0,
+    .accel_y = 0.0,
+    .accel_z = 0.0,
+    .gyro_x = 0.0,
+    .gyro_y = 0.0,
+    .gyro_z = 0.0,
+    .mag_x = 0.0,
+    .mag_y = 0.0,
+    .mag_z = 0.0,
+    .temperature = 0.0,
+    .humidity = 0.0
 };
-
-/* Store the latest temperature reading */
-static double latest_temperature = 0.0;
-
-/* Store the latest humidity reading */
-static double latest_humidity = 0.0;
 
 /* Semaphore for UI readiness - declared in main.c */
 extern struct k_sem ui_ready_sem;
@@ -95,52 +97,35 @@ void store_sensor_reading(sensor_msg_type_t type, double value)
     switch (type) {
     case MSG_TYPE_TEMPERATURE:
         /* Store the latest temperature */
-        latest_temperature = value;
+        g_sensor_data.temperature = value;
         SENSORS_VERBOSE("Storing temperature reading: %.2f°C\n", value);
-        
-        /* Store temperature in data structure */
-        if (g_sensor_data.count < g_sensor_data.max_count) {
-            g_sensor_data.readings[g_sensor_data.count].temperature = value;
-            g_sensor_data.readings[g_sensor_data.count].timestamp = k_uptime_get_32();
-            g_sensor_data.count++;
-            SENSORS_VERBOSE("Added temperature to readings array, count=%d\n", g_sensor_data.count);
-        } else {
-            /* Shift data to make room for new reading */
-            SENSORS_VERBOSE("Readings array full, shifting data\n");
-            for (uint32_t i = 0; i < g_sensor_data.max_count - 1; i++) {
-                g_sensor_data.readings[i] = g_sensor_data.readings[i + 1];
-            }
-            g_sensor_data.readings[g_sensor_data.max_count - 1].temperature = value;
-            g_sensor_data.readings[g_sensor_data.max_count - 1].timestamp = k_uptime_get_32();
-            g_sensor_data.overflow = true;
-        }
         break;
         
     case MSG_TYPE_HUMIDITY:
         /* Store the latest humidity */
-        latest_humidity = value;
+        g_sensor_data.humidity = value;
         SENSORS_VERBOSE("Storing humidity reading: %.2f%%\n", value);
         break;
         
-    case MSG_TYPE_ACCEL_X:
-    case MSG_TYPE_ACCEL_Y:
-    case MSG_TYPE_ACCEL_Z:
+    case MSG_TYPE_ACCEL_X: g_sensor_data.accel_x = value;
+    case MSG_TYPE_ACCEL_Y: g_sensor_data.accel_y = value;
+    case MSG_TYPE_ACCEL_Z: g_sensor_data.accel_z = value;
         /* Store accelerometer data */
         SENSORS_VERBOSE("Storing accelerometer reading (axis %d): %.2f\n", 
                       type - MSG_TYPE_ACCEL_X, value);
         break;
         
-    case MSG_TYPE_GYRO_X:
-    case MSG_TYPE_GYRO_Y:
-    case MSG_TYPE_GYRO_Z:
+    case MSG_TYPE_GYRO_X: g_sensor_data.gyro_x = value;
+    case MSG_TYPE_GYRO_Y: g_sensor_data.gyro_y = value;
+    case MSG_TYPE_GYRO_Z: g_sensor_data.gyro_z = value;
         /* Store gyroscope data */
         SENSORS_VERBOSE("Storing gyroscope reading (axis %d): %.2f\n", 
                       type - MSG_TYPE_GYRO_X, value);
         break;
         
-    case MSG_TYPE_MAG_X:
-    case MSG_TYPE_MAG_Y:
-    case MSG_TYPE_MAG_Z:
+    case MSG_TYPE_MAG_X: g_sensor_data.mag_x = value;
+    case MSG_TYPE_MAG_Y: g_sensor_data.mag_y = value;
+    case MSG_TYPE_MAG_Z: g_sensor_data.mag_z = value;
         /* Store magnetometer data */
         SENSORS_VERBOSE("Storing magnetometer reading (axis %d): %.2f\n", 
                       type - MSG_TYPE_MAG_X, value);
@@ -170,11 +155,6 @@ void store_sensor_reading(sensor_msg_type_t type, double value)
                 SENSORS_ERROR("Failed to send message to queue even after purge: %d\n", ret);
             }
         }
-        // if (ret == 0) {
-        //     SENSORS_VERBOSE("Message sent to queue: type=%d, value=%.2f\n", type, value);
-        // } else {
-        //     SENSORS_ERROR("Failed to send message to queue: %d\n", ret);
-        // }
     } else {
         SENSORS_ERROR("Message queue not available\n");
     }
@@ -185,49 +165,6 @@ void store_reading(double temperature)
 {
     SENSORS_VERBOSE("Using legacy store_reading() function\n");
     store_sensor_reading(MSG_TYPE_TEMPERATURE, temperature);
-}
-
-void set_latest_humidity(double humidity)
-{
-    SENSORS_VERBOSE("Using legacy set_latest_humidity() function\n");
-    store_sensor_reading(MSG_TYPE_HUMIDITY, humidity);
-}
-
-bool get_latest_temperature(double *temperature)
-{
-    if (temperature == NULL || g_sensor_data.count == 0) {
-        SENSORS_ERROR("Invalid temperature pointer or no readings available\n");
-        return false;
-    }
-    
-    *temperature = latest_temperature;
-    SENSORS_VERBOSE("Retrieved latest temperature: %.2f°C\n", *temperature);
-    return true;
-}
-
-bool get_latest_humidity(double *humidity)
-{
-    if (humidity == NULL) {
-        SENSORS_ERROR("Invalid humidity pointer\n");
-        return false;
-    }
-    
-    *humidity = latest_humidity;
-    SENSORS_VERBOSE("Retrieved latest humidity: %.2f%%\n", *humidity);
-    return true;
-}
-
-const sensor_data_t* get_sensor_data(void)
-{
-    SENSORS_VERBOSE("Returning sensor data structure, count=%d\n", g_sensor_data.count);
-    return &g_sensor_data;
-}
-
-void clear_sensor_data(void)
-{
-    SENSORS_INFO("Clearing sensor data\n");
-    g_sensor_data.count = 0;
-    g_sensor_data.overflow = false;
 }
 
 void sensors_init(void)
