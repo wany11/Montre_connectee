@@ -12,11 +12,14 @@
 #include "../../inc/timSec.h"
 
 ///////////////////// VARIABLES ////////////////////
+void sec_Animation(lv_obj_t * TargetObject, int delay);
+void min_Animation(lv_obj_t * TargetObject, int delay);
+void hour_Animation(lv_obj_t * TargetObject, int delay);
 
 // SCREEN: ui_Screen1
 void ui_Screen1_screen_init(void);
 lv_obj_t * ui_Screen1;
-lv_obj_t * ui_Image1;
+lv_obj_t * ui_Panel3;
 lv_obj_t * ui_HourLabel;
 lv_obj_t * ui_LabelSensor;
 lv_obj_t * ui_LabelTemp;
@@ -31,7 +34,18 @@ lv_obj_t * ui_mag_y;
 lv_obj_t * ui_mag_z;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_Screen2
+void ui_Screen2_screen_init(void);
+lv_obj_t * ui_Screen2;
+lv_obj_t * ui_Clock_Group;
+lv_obj_t * ui_hour;
+lv_obj_t * ui_min;
+lv_obj_t * ui_sec;
+// CUSTOM VARIABLES
+lv_obj_t * uic_Clock_Group;
+
 // EVENTS
+void ui_event____initial_actions0(lv_event_t * e);
 lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
@@ -45,8 +59,87 @@ lv_obj_t * ui____initial_actions0;
 #endif
 
 ///////////////////// ANIMATIONS ////////////////////
+void sec_Animation(lv_obj_t * TargetObject, int delay)
+{
+    ui_anim_user_data_t * PropertyAnimation_0_user_data = lv_mem_alloc(sizeof(ui_anim_user_data_t));
+    PropertyAnimation_0_user_data->target = TargetObject;
+    PropertyAnimation_0_user_data->val = -1;
+    lv_anim_t PropertyAnimation_0;
+    lv_anim_init(&PropertyAnimation_0);
+    lv_anim_set_time(&PropertyAnimation_0, 60000);
+    lv_anim_set_user_data(&PropertyAnimation_0, PropertyAnimation_0_user_data);
+    lv_anim_set_custom_exec_cb(&PropertyAnimation_0, _ui_anim_callback_set_image_angle);
+    lv_anim_set_values(&PropertyAnimation_0, 0, 3600);
+    lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_linear);
+    lv_anim_set_delay(&PropertyAnimation_0, delay + 0);
+    lv_anim_set_deleted_cb(&PropertyAnimation_0, _ui_anim_callback_free_user_data);
+    lv_anim_set_playback_time(&PropertyAnimation_0, 0);
+    lv_anim_set_playback_delay(&PropertyAnimation_0, 0);
+    lv_anim_set_repeat_count(&PropertyAnimation_0, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_set_repeat_delay(&PropertyAnimation_0, 0);
+    lv_anim_set_early_apply(&PropertyAnimation_0, true);
+    lv_anim_set_get_value_cb(&PropertyAnimation_0, &_ui_anim_callback_get_image_angle);
+    lv_anim_start(&PropertyAnimation_0);
+
+}
+void min_Animation(lv_obj_t * TargetObject, int delay)
+{
+    ui_anim_user_data_t * PropertyAnimation_0_user_data = lv_mem_alloc(sizeof(ui_anim_user_data_t));
+    PropertyAnimation_0_user_data->target = TargetObject;
+    PropertyAnimation_0_user_data->val = -1;
+    lv_anim_t PropertyAnimation_0;
+    lv_anim_init(&PropertyAnimation_0);
+    lv_anim_set_time(&PropertyAnimation_0, 3600000);
+    lv_anim_set_user_data(&PropertyAnimation_0, PropertyAnimation_0_user_data);
+    lv_anim_set_custom_exec_cb(&PropertyAnimation_0, _ui_anim_callback_set_image_angle);
+    lv_anim_set_values(&PropertyAnimation_0, 0, 3600);
+    lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_linear);
+    lv_anim_set_delay(&PropertyAnimation_0, delay + 0);
+    lv_anim_set_deleted_cb(&PropertyAnimation_0, _ui_anim_callback_free_user_data);
+    lv_anim_set_playback_time(&PropertyAnimation_0, 0);
+    lv_anim_set_playback_delay(&PropertyAnimation_0, 0);
+    lv_anim_set_repeat_count(&PropertyAnimation_0, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_set_repeat_delay(&PropertyAnimation_0, 0);
+    lv_anim_set_early_apply(&PropertyAnimation_0, true);
+    lv_anim_set_get_value_cb(&PropertyAnimation_0, &_ui_anim_callback_get_image_angle);
+    lv_anim_start(&PropertyAnimation_0);
+
+}
+void hour_Animation(lv_obj_t * TargetObject, int delay)
+{
+    ui_anim_user_data_t * PropertyAnimation_0_user_data = lv_mem_alloc(sizeof(ui_anim_user_data_t));
+    PropertyAnimation_0_user_data->target = TargetObject;
+    PropertyAnimation_0_user_data->val = -1;
+    lv_anim_t PropertyAnimation_0;
+    lv_anim_init(&PropertyAnimation_0);
+    lv_anim_set_time(&PropertyAnimation_0, 216000000);
+    lv_anim_set_user_data(&PropertyAnimation_0, PropertyAnimation_0_user_data);
+    lv_anim_set_custom_exec_cb(&PropertyAnimation_0, _ui_anim_callback_set_image_angle);
+    lv_anim_set_values(&PropertyAnimation_0, 0, 3600);
+    lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_linear);
+    lv_anim_set_delay(&PropertyAnimation_0, delay + 0);
+    lv_anim_set_deleted_cb(&PropertyAnimation_0, _ui_anim_callback_free_user_data);
+    lv_anim_set_playback_time(&PropertyAnimation_0, 0);
+    lv_anim_set_playback_delay(&PropertyAnimation_0, 0);
+    lv_anim_set_repeat_count(&PropertyAnimation_0, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_set_repeat_delay(&PropertyAnimation_0, 0);
+    lv_anim_set_early_apply(&PropertyAnimation_0, true);
+    lv_anim_set_get_value_cb(&PropertyAnimation_0, &_ui_anim_callback_get_image_angle);
+    lv_anim_start(&PropertyAnimation_0);
+
+}
 
 ///////////////////// FUNCTIONS ////////////////////
+void ui_event____initial_actions0(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        sec_Animation(ui_sec, 0);
+        min_Animation(ui_min, 0);
+        hour_Animation(ui_hour, 0);
+    }
+}
 
 ///////////////////// SCREENS ////////////////////
 
@@ -62,28 +155,7 @@ extern struct k_sem ui_ready_sem;
 void process_queue(void)
 {
     sensor_msg_t msg;
-    char temp_str[32];
-    char humidity_str[32];
-    char accel_x_str[32];
-    char accel_y_str[32];
-    char accel_z_str[32];
-    char gyro_x_str[32];
-    char gyro_y_str[32];
-    char gyro_z_str[32];
-    char mag_x_str[32];
-    char mag_y_str[32];
-    char mag_z_str[32];
-    bool temp_updated = false;
-    bool humidity_updated = false;
-    bool accel_x_updated = false;
-    bool accel_y_updated = false;
-    bool accel_z_updated = false;
-    bool gyro_x_updated = false;
-    bool gyro_y_updated = false;
-    bool gyro_z_updated = false;
-    bool mag_x_updated = false;
-    bool mag_y_updated = false;
-    bool mag_z_updated = false;
+    static char buffer[32];
     struct k_msgq *temp_msgq = get_msgq();
     
     if (temp_msgq == NULL) {
@@ -92,132 +164,70 @@ void process_queue(void)
     
     /* Process all messages in the queue */
     while (k_msgq_get(temp_msgq, &msg, K_NO_WAIT) == 0) {
+        lv_obj_t *target_label = NULL;
+        const char *format = NULL;
+
         switch(msg.type) {
         case MSG_TYPE_TEMPERATURE:
-            /* Update temperature string */
-            snprintf(temp_str, sizeof(temp_str), "Temperature: %.1f °C", msg.value);
-            temp_updated = true;
+            target_label = ui_LabelTemp;
+            format = "Temperature: %.1f °C";
             break;
             
         case MSG_TYPE_HUMIDITY:
-            /* Update humidity string */
-            snprintf(humidity_str, sizeof(humidity_str), "Humidity: %.1f%%", msg.value);
-            humidity_updated = true;
+            target_label = ui_LabelSensor;
+            format = "Humidity: %.1f%%";
             break;
 
         case MSG_TYPE_ACCEL_X:
-            /* Update accelerometer X string */
-            snprintf(accel_x_str, sizeof(accel_x_str), "Accel X: %.2f", msg.value);
-            accel_x_updated = true;
+            target_label = ui_accel_x;
+            format = "Accel X: %.2f";
             break;
 
         case MSG_TYPE_ACCEL_Y:
-            /* Update accelerometer Y string */
-            snprintf(accel_y_str, sizeof(accel_y_str), "Accel Y: %.2f", msg.value);
-            accel_y_updated = true;
+            target_label = ui_accel_y;
+            format = "Accel Y: %.2f";
             break;
 
         case MSG_TYPE_ACCEL_Z:
-            /* Update accelerometer Z string */
-            snprintf(accel_z_str, sizeof(accel_z_str), "Accel Z: %.2f", msg.value);
-            accel_z_updated = true;
+            target_label = ui_accel_z;
+            format = "Accel Z: %.2f";
             break;
 
         case MSG_TYPE_GYRO_X:
-            /* Update gyroscope X string */
-            snprintf(gyro_x_str, sizeof(gyro_x_str), "Gyro X: %.2f", msg.value);
-            gyro_x_updated = true;
+            target_label = ui_gyro_x;
+            format = "Gyro X: %.2f";
             break;
 
         case MSG_TYPE_GYRO_Y:
-            /* Update gyroscope Y string */
-            snprintf(gyro_y_str, sizeof(gyro_y_str), "Gyro Y: %.2f", msg.value);
-            gyro_y_updated = true;
+            target_label = ui_gyro_y;
+            format = "Gyro Y: %.2f";
             break;
 
         case MSG_TYPE_GYRO_Z:
-            /* Update gyroscope Z string */
-            snprintf(gyro_z_str, sizeof(gyro_z_str), "Gyro Z: %.2f", msg.value);
-            gyro_z_updated = true;
+            target_label = ui_gyro_z;
+            format = "Gyro Z: %.2f";
             break;
 
         case MSG_TYPE_MAG_X:
-            /* Update magnetometer X string */
-            snprintf(mag_x_str, sizeof(mag_x_str), "Mag X: %.2f", msg.value);
-            mag_x_updated = true;
+            target_label = ui_mag_x;
+            format = "Mag X: %.2f";
             break;
 
         case MSG_TYPE_MAG_Y:
-            /* Update magnetometer Y string */
-            snprintf(mag_y_str, sizeof(mag_y_str), "Mag Y: %.2f", msg.value);
-            mag_y_updated = true;
+            target_label = ui_mag_y;
+            format = "Mag Y: %.2f";
             break;
 
         case MSG_TYPE_MAG_Z:
-            /* Update magnetometer Z string */
-            snprintf(mag_z_str, sizeof(mag_z_str), "Mag Z: %.2f", msg.value);
-            mag_z_updated = true;
-            break;
-
-        default:
-            /* Unknown message type */
+            target_label = ui_mag_z;
+            format = "Mag Z: %.2f";
             break;
         }
-    }
-    
-    /* Update the temperature label if new data is available */
-    if (temp_updated && ui_LabelTemp != NULL) {
-        lv_label_set_text(ui_LabelTemp, temp_str);
-    }
-    
-    /* Update the humidity label if new data is available */
-    if (humidity_updated && ui_LabelSensor != NULL) {
-        lv_label_set_text(ui_LabelSensor, humidity_str);
-    }
-
-    /* Update the accelerometer X label if new data is available */
-    if (accel_x_updated && ui_accel_x != NULL) {
-        lv_label_set_text(ui_accel_x, accel_x_str);
-    }
-
-    /* Update the accelerometer Y label if new data is available */
-    if (accel_y_updated && ui_accel_y != NULL) {
-        lv_label_set_text(ui_accel_y, accel_y_str);
-    }
-
-    /* Update the accelerometer Z label if new data is available */
-    if (accel_z_updated && ui_accel_z != NULL) {
-        lv_label_set_text(ui_accel_z, accel_z_str);
-    }
-
-    /* Update the gyroscope X label if new data is available */
-    if (gyro_x_updated && ui_gyro_x != NULL) {
-        lv_label_set_text(ui_gyro_x, gyro_x_str);
-    }
-
-    /* Update the gyroscope Y label if new data is available */
-    if (gyro_y_updated && ui_gyro_y != NULL) {
-        lv_label_set_text(ui_gyro_y, gyro_y_str);
-    }
-
-    /* Update the gyroscope Z label if new data is available */
-    if (gyro_z_updated && ui_gyro_z != NULL) {
-        lv_label_set_text(ui_gyro_z, gyro_z_str);
-    }
-
-    /* Update the magnetometer X label if new data is available */
-    if (mag_x_updated && ui_mag_x != NULL) {
-        lv_label_set_text(ui_mag_x, mag_x_str);
-    }
-
-    /* Update the magnetometer Y label if new data is available */
-    if (mag_y_updated && ui_mag_y != NULL) {
-        lv_label_set_text(ui_mag_y, mag_y_str);
-    }
-
-    /* Update the magnetometer Z label if new data is available */
-    if (mag_z_updated && ui_mag_z != NULL) {
-        lv_label_set_text(ui_mag_z, mag_z_str);
+        
+        if (target_label != NULL && format != NULL) {
+            lv_snprintf(buffer, sizeof(buffer), format, msg.value);
+            lv_label_set_text(target_label, buffer);
+        }
     }
 }
 
@@ -232,7 +242,11 @@ void ui_init(void)
                                                false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
     ui_Screen1_screen_init();
+    ui_Screen2_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
+    lv_obj_add_event_cb(ui____initial_actions0, ui_event____initial_actions0, LV_EVENT_ALL, NULL);
+
+    lv_disp_load_scr(ui____initial_actions0);
     lv_disp_load_scr(ui_Screen1);
     
     printk("UI initialization completed\n");
@@ -256,16 +270,31 @@ void ui_thread_entry(void *p1, void *p2, void *p3)
     }
 
     while (1) {
-        /* Process sensor data from queue */
-        process_queue();
+        /* Check which screen is active */
+        lv_obj_t *current_screen = lv_scr_act();
         
-        if (ui_HourLabel != NULL) {
-            char time_str[32];
-            format_time(get_temps(), time_str, sizeof(time_str)); // Convertir temps en hh:mm:ss
-            lv_label_set_text(ui_HourLabel, time_str);
+        if (current_screen == ui_Screen1) {
+            static uint32_t last_update = 0;
+            uint32_t current_time = k_uptime_get_32();
+            
+            // Mise à jour des capteurs toutes les 500ms
+            if (current_time - last_update >= 500) {
+                process_queue();
+                last_update = current_time;
+            }
+            
+            // Mise à jour de l'heure chaque seconde
+            static uint32_t last_time_update = 0;
+            if (current_time - last_time_update >= 1000) {
+                if (ui_HourLabel != NULL) {
+                    char time_str[32];
+                    format_time(get_temps(), time_str, sizeof(time_str));
+                    lv_label_set_text(ui_HourLabel, time_str);
+                }
+                last_time_update = current_time;
+            }
         }
 
-        /* Sleep for a short time (1 sec) */
-        k_sleep(K_SECONDS(1));
+        k_sleep(K_MSEC(100)); // Réduit les cycles CPU inutiles
     }
 }

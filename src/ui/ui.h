@@ -21,7 +21,7 @@ extern "C" {
 // SCREEN: ui_Screen1
 void ui_Screen1_screen_init(void);
 extern lv_obj_t * ui_Screen1;
-extern lv_obj_t * ui_Image1;
+extern lv_obj_t * ui_Panel3;
 extern lv_obj_t * ui_HourLabel;
 extern lv_obj_t * ui_LabelSensor;
 extern lv_obj_t * ui_LabelTemp;
@@ -36,15 +36,31 @@ extern lv_obj_t * ui_mag_y;
 extern lv_obj_t * ui_mag_z;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_Screen2
+void ui_Screen2_screen_init(void);
+extern lv_obj_t * ui_Screen2;
+extern lv_obj_t * ui_Clock_Group;
+extern lv_obj_t * ui_hour;
+extern lv_obj_t * ui_min;
+extern lv_obj_t * ui_sec;
+// CUSTOM VARIABLES
+extern lv_obj_t * uic_Clock_Group;
+
 // EVENTS
 
+void ui_event____initial_actions0(lv_event_t * e);
 extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_1780325426);    // assets/Capture d'écran 2025-03-21 113557.png
+LV_IMG_DECLARE(ui_img_clockwise_hour_png);    // assets/clockwise_hour.png
+LV_IMG_DECLARE(ui_img_clockwise_min_png);    // assets/clockwise_min.png
+LV_IMG_DECLARE(ui_img_clockwise_sec_png);    // assets/clockwise_sec.png
 
 // UI INIT
 void ui_init(void);
+
+void lv_scr_load_myscreen(lv_obj_t * new_scr);
 
 /**
  * @brief Entry function for the UI thread
