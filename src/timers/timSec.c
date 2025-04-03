@@ -1,6 +1,6 @@
 #include "../../inc/timSec.h"
 
-static uint32_t temps = 43200; // Variable to store the time in seconds
+static uint32_t temps = 56730; // Variable to store the time in seconds
 
 /* Timer callback function */
 static void timer_handler(struct k_timer *dummy)
