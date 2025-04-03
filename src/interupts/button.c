@@ -77,6 +77,7 @@ static void button4_pressed_cb(const struct device *dev, struct gpio_callback *c
 {
     BUTTON_VERBOSE("Button 4 pressed at %u ms\n", k_uptime_get_32());
     _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
+    
 }
 
 /* Initialize button */

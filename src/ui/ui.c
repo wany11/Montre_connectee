@@ -12,9 +12,7 @@
 #include "../../inc/timSec.h"
 
 ///////////////////// VARIABLES ////////////////////
-void sec_Animation(lv_obj_t * TargetObject, int delay);
-void min_Animation(lv_obj_t * TargetObject, int delay);
-void hour_Animation(lv_obj_t * TargetObject, int delay);
+
 
 // SCREEN: ui_Screen1
 void ui_Screen1_screen_init(void);
@@ -59,7 +57,7 @@ lv_obj_t * ui____initial_actions0;
 #endif
 
 ///////////////////// ANIMATIONS ////////////////////
-void sec_Animation(lv_obj_t * TargetObject, int delay)
+void sec_Animation(lv_obj_t * TargetObject, int angle)
 {
     ui_anim_user_data_t * PropertyAnimation_0_user_data = lv_mem_alloc(sizeof(ui_anim_user_data_t));
     PropertyAnimation_0_user_data->target = TargetObject;
@@ -69,9 +67,9 @@ void sec_Animation(lv_obj_t * TargetObject, int delay)
     lv_anim_set_time(&PropertyAnimation_0, 60000);
     lv_anim_set_user_data(&PropertyAnimation_0, PropertyAnimation_0_user_data);
     lv_anim_set_custom_exec_cb(&PropertyAnimation_0, _ui_anim_callback_set_image_angle);
-    lv_anim_set_values(&PropertyAnimation_0, 0, 3600);
+    lv_anim_set_values(&PropertyAnimation_0, angle, angle+3600);
     lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_linear);
-    lv_anim_set_delay(&PropertyAnimation_0, delay + 0);
+    lv_anim_set_delay(&PropertyAnimation_0, 0);
     lv_anim_set_deleted_cb(&PropertyAnimation_0, _ui_anim_callback_free_user_data);
     lv_anim_set_playback_time(&PropertyAnimation_0, 0);
     lv_anim_set_playback_delay(&PropertyAnimation_0, 0);
@@ -82,7 +80,7 @@ void sec_Animation(lv_obj_t * TargetObject, int delay)
     lv_anim_start(&PropertyAnimation_0);
 
 }
-void min_Animation(lv_obj_t * TargetObject, int delay)
+void min_Animation(lv_obj_t * TargetObject, int angle)
 {
     ui_anim_user_data_t * PropertyAnimation_0_user_data = lv_mem_alloc(sizeof(ui_anim_user_data_t));
     PropertyAnimation_0_user_data->target = TargetObject;
@@ -92,9 +90,9 @@ void min_Animation(lv_obj_t * TargetObject, int delay)
     lv_anim_set_time(&PropertyAnimation_0, 3600000);
     lv_anim_set_user_data(&PropertyAnimation_0, PropertyAnimation_0_user_data);
     lv_anim_set_custom_exec_cb(&PropertyAnimation_0, _ui_anim_callback_set_image_angle);
-    lv_anim_set_values(&PropertyAnimation_0, 0, 3600);
+    lv_anim_set_values(&PropertyAnimation_0, angle, angle+3600);
     lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_linear);
-    lv_anim_set_delay(&PropertyAnimation_0, delay + 0);
+    lv_anim_set_delay(&PropertyAnimation_0, 0);
     lv_anim_set_deleted_cb(&PropertyAnimation_0, _ui_anim_callback_free_user_data);
     lv_anim_set_playback_time(&PropertyAnimation_0, 0);
     lv_anim_set_playback_delay(&PropertyAnimation_0, 0);
@@ -105,7 +103,7 @@ void min_Animation(lv_obj_t * TargetObject, int delay)
     lv_anim_start(&PropertyAnimation_0);
 
 }
-void hour_Animation(lv_obj_t * TargetObject, int delay)
+void hour_Animation(lv_obj_t * TargetObject, int angle)
 {
     ui_anim_user_data_t * PropertyAnimation_0_user_data = lv_mem_alloc(sizeof(ui_anim_user_data_t));
     PropertyAnimation_0_user_data->target = TargetObject;
@@ -115,9 +113,9 @@ void hour_Animation(lv_obj_t * TargetObject, int delay)
     lv_anim_set_time(&PropertyAnimation_0, 216000000);
     lv_anim_set_user_data(&PropertyAnimation_0, PropertyAnimation_0_user_data);
     lv_anim_set_custom_exec_cb(&PropertyAnimation_0, _ui_anim_callback_set_image_angle);
-    lv_anim_set_values(&PropertyAnimation_0, 0, 3600);
+    lv_anim_set_values(&PropertyAnimation_0, angle, angle+3600);
     lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_linear);
-    lv_anim_set_delay(&PropertyAnimation_0, delay + 0);
+    lv_anim_set_delay(&PropertyAnimation_0, 0);
     lv_anim_set_deleted_cb(&PropertyAnimation_0, _ui_anim_callback_free_user_data);
     lv_anim_set_playback_time(&PropertyAnimation_0, 0);
     lv_anim_set_playback_delay(&PropertyAnimation_0, 0);
@@ -129,15 +127,38 @@ void hour_Animation(lv_obj_t * TargetObject, int delay)
 
 }
 
+// Add this function after the animation functions
+void init_clock_positions(void)
+{
+    uint32_t temps = get_temps();
+    uint32_t hours = (temps / 3600) % 12;  // 12-hour format
+    uint32_t minutes = (temps / 60) % 60;
+    uint32_t seconds = temps % 60;
+
+    // Calculate angles in tenths of degrees
+    uint32_t hour_angle = (hours * 3600) / 12 + (minutes * 3600) / (12 * 60);
+    uint32_t min_angle = (minutes * 3600) / 60;
+    uint32_t sec_angle = (seconds * 3600) / 60;
+
+    // Start animations with correct initial angles
+    if (ui_sec != NULL) {
+        sec_Animation(ui_sec, sec_angle);
+    }
+    if (ui_min != NULL) {
+        min_Animation(ui_min, min_angle);
+    }
+    if (ui_hour != NULL) {
+        hour_Animation(ui_hour, hour_angle);
+    }
+}
+
 ///////////////////// FUNCTIONS ////////////////////
 void ui_event____initial_actions0(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_SCREEN_LOAD_START) {
-        sec_Animation(ui_sec, 0);
-        min_Animation(ui_min, 0);
-        hour_Animation(ui_hour, 0);
+        init_clock_positions();
     }
 }
 

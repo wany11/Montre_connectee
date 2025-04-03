@@ -59,9 +59,10 @@ LV_IMG_DECLARE(ui_img_clockwise_sec_png);    // assets/clockwise_sec.png
 
 // UI INIT
 void ui_init(void);
-
-void lv_scr_load_myscreen(lv_obj_t * new_scr);
-
+void sec_Animation(lv_obj_t * TargetObject, int angle);
+void min_Animation(lv_obj_t * TargetObject, int angle);
+void hour_Animation(lv_obj_t * TargetObject, int angle);
+void init_clock_positions(void);
 /**
  * @brief Entry function for the UI thread
  */
