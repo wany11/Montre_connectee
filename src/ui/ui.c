@@ -39,6 +39,18 @@ lv_obj_t * ui_Clock_Group;
 lv_obj_t * ui_hour;
 lv_obj_t * ui_min;
 lv_obj_t * ui_sec;
+lv_obj_t * ui_ThreeH;
+lv_obj_t * ui_SixH;
+lv_obj_t * ui_NineH;
+lv_obj_t * ui_OneH;
+lv_obj_t * ui_TwoH;
+lv_obj_t * ui_FourH;
+lv_obj_t * ui_FiveH;
+lv_obj_t * ui_SevenH;
+lv_obj_t * ui_EightH;
+lv_obj_t * ui_TenH;
+lv_obj_t * ui_ElevH;
+lv_obj_t * ui_TwelveH;
 // CUSTOM VARIABLES
 lv_obj_t * uic_Clock_Group;
 
