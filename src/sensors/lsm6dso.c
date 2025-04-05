@@ -21,7 +21,7 @@ static const struct device *lsm6dso_dev = NULL;
 
 static inline float out_ev(struct sensor_value *val)
 {
-    return (val->val1 + (float)val->val2 / 1000000);
+    return (val->val1 + (float)val->val2 / 1000000);  // Correction: val->val2
 }
 
 static void lsm6dso_process_sample(const struct device *dev)
@@ -79,7 +79,7 @@ static void lsm6dso_process_sample(const struct device *dev)
     store_sensor_reading(MSG_TYPE_GYRO_Y, gyro_y);
     store_sensor_reading(MSG_TYPE_GYRO_Z, gyro_z);
 
-    LSM6DSO_VERBOSE("Gyro x:%.3f rad/s y:%.3f rad/s z:%.3f rad/s\n", gyro_x, gyro_y, gyro_z);
+    LSM6DSO_INFO("Gyro x:%.3f rad/s y:%.3f rad/s z:%.3f rad/s\n", gyro_x, gyro_y, gyro_z);
 
     ++obs;
     LSM6DSO_VERBOSE("Observation: %u\n", obs);
@@ -90,11 +90,13 @@ static int set_sampling_freq(const struct device *dev)
     int ret = 0;
     struct sensor_value odr_attr;
 
-    /* set accel/gyro sampling frequency to 12.5 Hz */
-    odr_attr.val1 = 12.5;
+    /* Régler sur la fréquence la plus basse possible
+       Le LSM6DSO supporte généralement des fréquences comme:
+       0 (désactivé), 12.5Hz, 26Hz, 52Hz, etc. */
+    odr_attr.val1 = 0;  /* Hz - fréquence la plus basse ou mode power-down */
     odr_attr.val2 = 0;
-
-    LSM6DSO_INFO("Setting sampling frequency to %d Hz\n", odr_attr.val1);
+    
+    LSM6DSO_INFO("Setting sampling frequency to %d Hz (minimum available)\n", odr_attr.val1);
     
     ret = sensor_attr_set(dev, SENSOR_CHAN_ACCEL_XYZ,
             SENSOR_ATTR_SAMPLING_FREQUENCY, &odr_attr);

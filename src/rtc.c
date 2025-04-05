@@ -14,11 +14,11 @@ int rtc_init(void)
     /* Récupérer l'appareil RTC */
     rtc_dev = DEVICE_DT_GET(DT_NODELABEL(rv_8263));
     if (!device_is_ready(rtc_dev)) {
-        RTC_ERROR("RV8263 n'est pas prêt");
+        RTC_ERROR("RV8263 n'est pas prêt\n");
         return -ENODEV;
     }
 
-    RTC_INFO("RTC RV8263 initialisée avec succès");
+    RTC_INFO("RTC RV8263 initialisée avec succès\n");
     return 0;
 }
 
@@ -39,11 +39,11 @@ int rtc_set_datetime(uint16_t year, uint8_t month, uint8_t day,
 
     int ret = rtc_set_time(rtc_dev, &time);
     if (ret < 0) {
-        RTC_ERROR("Impossible de définir l'heure: %d", ret);
+        RTC_ERROR("Impossible de définir l'heure: %d\n", ret);
         return ret;
     }
 
-    RTC_INFO("Heure définie: %04d-%02d-%02d %02d:%02d:%02d",
+    RTC_INFO("Heure définie: %04d-%02d-%02d %02d:%02d:%02d\n",
             year, month, day, hour, minute, second);
     return 0;
 }
@@ -58,7 +58,7 @@ int rtc_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day,
     struct rtc_time time;
     int ret = rtc_get_time(rtc_dev, &time);
     if (ret < 0) {
-        RTC_ERROR("Impossible de lire l'heure: %d", ret);
+        RTC_ERROR("Impossible de lire l'heure: %d\n", ret);
         return ret;
     }
 
@@ -69,7 +69,7 @@ int rtc_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day,
     *minute = time.tm_min;
     *second = time.tm_sec;
 
-    RTC_INFO("Heure actuelle: %04d-%02d-%02d %02d:%02d:%02d",
+    RTC_INFO("Heure actuelle: %04d-%02d-%02d %02d:%02d:%02d\n",
             *year, *month, *day, *hour, *minute, *second);
     return 0;
 }

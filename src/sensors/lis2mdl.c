@@ -51,7 +51,7 @@ static void lis2mdl_process_sample(const struct device *dev)
     store_sensor_reading(MSG_TYPE_MAG_Y, mag_y);
     store_sensor_reading(MSG_TYPE_MAG_Z, mag_z);
 
-    LIS2MDL_VERBOSE("Magnetic field x:%.2f uT y:%.2f uT z:%.2f uT\n", mag_x, mag_y, mag_z);
+    LIS2MDL_INFO("Magnetic field x:%.2f uT y:%.2f uT z:%.2f uT\n", mag_x, mag_y, mag_z);
 
     ++obs;
     LIS2MDL_VERBOSE("Observation: %u\n", obs);
@@ -62,8 +62,10 @@ static int set_sampling_freq(const struct device *dev)
     int ret = 0;
     struct sensor_value odr_attr;
 
-    /* set magnetometer sampling frequency to 10 Hz (a typical value for LIS2MDL) */
-    odr_attr.val1 = 10;
+    /* Réduire la fréquence d'échantillonnage pour correspondre au timer */
+    /* 1/20 Hz = 0.05 Hz pour lis2mdl_sampling_period_sec = 20 */
+    /* La fréquence minimale acceptée par le capteur sera utilisée */
+    odr_attr.val1 = 1;  /* Hz - utiliser la fréquence minimum supportée */
     odr_attr.val2 = 0;
 
     LIS2MDL_INFO("Setting sampling frequency to %d Hz\n", odr_attr.val1);

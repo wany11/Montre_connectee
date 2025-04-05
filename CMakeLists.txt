@@ -12,6 +12,6 @@ set(LVGL_DIR ${ZEPHYR_LVGL_MODULE_DIR})
 
 FILE(GLOB app_sources src/*.c src/ui/*.c src/ui/images/*.c src/ui/fonts/*.c src/ui/screens/*.c src/ui/components/*.c src/sensors/*.c src/timers/*.c src/interupts/*.c src/bluetooth/*.c)
 target_sources(app PRIVATE ${app_sources})
-target_compile_definitions(app PRIVATE DEBUG_LEVEL=1)
+target_compile_definitions(app PRIVATE DEBUG_LEVEL=2)
 
 
