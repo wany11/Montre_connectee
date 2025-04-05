@@ -94,7 +94,7 @@ static int set_sampling_freq(const struct device *dev)
     odr_attr.val1 = 12.5;
     odr_attr.val2 = 0;
 
-    LSM6DSO_INFO("Setting sampling frequency to %.1f Hz\n", odr_attr.val1);
+    LSM6DSO_INFO("Setting sampling frequency to %d Hz\n", odr_attr.val1);
     
     ret = sensor_attr_set(dev, SENSOR_CHAN_ACCEL_XYZ,
             SENSOR_ATTR_SAMPLING_FREQUENCY, &odr_attr);
