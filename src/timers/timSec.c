@@ -24,10 +24,10 @@ void start_timer(void)
     int ret = rtc_init();
     if (ret == 0) {
         rtc_available = true;
-        DEBUG_INFO_PRINT("TIMER", "RTC détectée et initialisée avec succès");
+        DEBUG_INFO_PRINT("TIMER", "RTC détectée et initialisée avec succès\n");
     } else {
         rtc_available = false;
-        DEBUG_ERROR_PRINT("TIMER", "RTC non détectée, utilisation du compteur de secours");
+        DEBUG_ERROR_PRINT("TIMER", "RTC non détectée, utilisation du compteur de secours\n");
         
         // Initialiser le timer de secours (1 seconde d'intervalle)
         k_timer_init(&fake_timer, fake_timer_expiry, NULL);
@@ -45,7 +45,7 @@ uint32_t get_temps(void)
         // Obtenir l'heure actuelle depuis le RTC
         int ret = rtc_get_datetime(&year, &month, &day, &hour, &minute, &second);
         if (ret < 0) {
-            DEBUG_ERROR_PRINT("TIMER", "Erreur lors de la lecture RTC: %d", ret);
+            DEBUG_ERROR_PRINT("TIMER", "Erreur lors de la lecture RTC: %d\n", ret);
             return fake_time;  // Utiliser le temps de secours en cas d'erreur
         }
         
@@ -76,7 +76,7 @@ int set_time(uint8_t hour, uint8_t minute, uint8_t second)
         
         int ret = rtc_get_datetime(&year, &month, &day, &old_hour, &old_minute, &old_second);
         if (ret < 0) {
-            DEBUG_ERROR_PRINT("TIMER", "Erreur lors de la lecture RTC pour réglage: %d", ret);
+            DEBUG_ERROR_PRINT("TIMER", "Erreur lors de la lecture RTC pour réglage: %d\n", ret);
             return ret;
         }
         
@@ -85,7 +85,7 @@ int set_time(uint8_t hour, uint8_t minute, uint8_t second)
     } else {
         // Définir l'heure sur le compteur de secours
         fake_time = hour * 3600 + minute * 60 + second;
-        DEBUG_INFO_PRINT("TIMER", "Heure définie sur le compteur de secours: %02d:%02d:%02d", 
+        DEBUG_INFO_PRINT("TIMER", "Heure définie sur le compteur de secours: %02d:%02d:%02d\n", 
                          hour, minute, second);
         return 0;
     }

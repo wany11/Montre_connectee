@@ -56,12 +56,12 @@ static void hts221_process_sample(const struct device *dev)
     HTS221_VERBOSE("Observation: %u\n", obs);
 }
 
-// static void hts221_handler(const struct device *dev,
-//                            const struct sensor_trigger *trig)
-// {
-//     HTS221_VERBOSE("Trigger handler called\n");
-//     hts221_process_sample(dev);
-// }
+static void hts221_handler(const struct device *dev,
+                           const struct sensor_trigger *trig)
+{
+    HTS221_VERBOSE("Trigger handler called\n");
+    hts221_process_sample(dev);
+}
 
 bool my_hts221_init(void)
 {
@@ -92,18 +92,18 @@ bool my_hts221_init(void)
 
     HTS221_INFO("Device found and ready\n");
 
-    // if (IS_ENABLED(CONFIG_HTS221_TRIGGER)) {
-    //     HTS221_INFO("Setting up trigger\n");
-    //     struct sensor_trigger trig = {
-    //         .type = SENSOR_TRIG_DATA_READY,
-    //         .chan = SENSOR_CHAN_ALL,
-    //     };
-    //     if (sensor_trigger_set(hts221_dev, &trig, hts221_handler) < 0) {
-    //         HTS221_ERROR("Cannot configure trigger\n");
-    //         return false;
-    //     }
-    //     HTS221_INFO("Trigger configured successfully\n");
-    // }
+    if (IS_ENABLED(CONFIG_HTS221_TRIGGER)) {
+        HTS221_INFO("Setting up trigger\n");
+        struct sensor_trigger trig = {
+            .type = SENSOR_TRIG_DATA_READY,
+            .chan = SENSOR_CHAN_ALL,
+        };
+        if (sensor_trigger_set(hts221_dev, &trig, hts221_handler) < 0) {
+            HTS221_ERROR("Cannot configure trigger\n");
+            return false;
+        }
+        HTS221_INFO("Trigger configured successfully\n");
+    }
     
     HTS221_INFO("Temperature and humidity sensor initialized successfully\n");
     return true;

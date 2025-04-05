@@ -28,18 +28,6 @@ sensor_data_t g_sensor_data = {
 /* Semaphore for UI readiness - declared in main.c */
 extern struct k_sem ui_ready_sem;
 
-/* Timer pour le capteur HTS221 */
-static struct k_timer hts221_timer;
-/* Timer pour le capteur LIS2MDL */
-static struct k_timer lis2mdl_timer;
-/* Timer pour le capteur LSM6DSO */
-static struct k_timer lsm6dso_timer;
-
-/* Déclaration en tant que variable globale */
-static uint32_t hts221_sampling_period_sec = 5;
-static uint32_t lis2mdl_sampling_period_sec = 20;
-static uint32_t lsm6dso_sampling_period_sec = 30;
-
 static struct k_sem hts221_sem;
 static struct k_sem lis2mdl_sem;
 static struct k_sem lsm6dso_sem;
@@ -60,27 +48,6 @@ static k_tid_t hts221_tid;
 static k_tid_t lis2mdl_tid;
 static k_tid_t lsm6dso_tid;
 
-/* Fonction de rappel pour le timer HTS221 */
-static void hts221_timer_expiry_function(struct k_timer *timer)
-{
-    /* Cette fonction est appelée quand le timer expire */
-    SENSORS_VERBOSE("HTS221 timer expired\n");
-}
-
-/* Fonction de rappel pour le timer LIS2MDL */
-static void lis2mdl_timer_expiry_function(struct k_timer *timer)
-{
-    /* Cette fonction est appelée quand le timer expire */
-    SENSORS_VERBOSE("LIS2MDL timer expired\n");
-}
-
-/* Fonction de rappel pour le timer LSM6DSO */
-static void lsm6dso_timer_expiry_function(struct k_timer *timer)
-{
-    /* Cette fonction est appelée quand le timer expire */
-    SENSORS_VERBOSE("LSM6DSO timer expired\n");
-}
-
 /* Thread functions */
 static void hts221_thread_func(void *p1, void *p2, void *p3)
 {
@@ -91,46 +58,36 @@ static void hts221_thread_func(void *p1, void *p2, void *p3)
         /* Signal that sampling is complete */
         k_sem_give(&hts221_sem);
         SENSORS_VERBOSE("HTS221 sampling complete\n");
-        
-        /* Attendre que le timer de 5 secondes expire */
-        k_timer_start(&hts221_timer, K_SECONDS(hts221_sampling_period_sec), K_NO_WAIT);
-        k_timer_status_sync(&hts221_timer);
     }
 }
 
 static void lis2mdl_thread_func(void *p1, void *p2, void *p3)
 {
-    SENSORS_INFO("LIS2MDL thread starting\n");
-    
     while (1) {
+        /* Wait for HTS221 to complete */
+        k_sem_take(&hts221_sem, K_FOREVER);
+        
         SENSORS_VERBOSE("Starting LIS2MDL sampling\n");
         lis2mdl_sample();
         
         /* Signal that sampling is complete */
         k_sem_give(&lis2mdl_sem);
         SENSORS_VERBOSE("LIS2MDL sampling complete\n");
-        
-        /* Attendre simplement que le timer expire, comme pour HTS221 */
-        k_timer_start(&lis2mdl_timer, K_SECONDS(lis2mdl_sampling_period_sec), K_NO_WAIT);
-        k_timer_status_sync(&lis2mdl_timer);
     }
 }
 
 static void lsm6dso_thread_func(void *p1, void *p2, void *p3)
 {
-    SENSORS_INFO("LSM6DSO thread starting\n");
-    
     while (1) {
+        /* Wait for LIS2MDL to complete */
+        k_sem_take(&lis2mdl_sem, K_FOREVER);
+        
         SENSORS_VERBOSE("Starting LSM6DSO sampling\n");
         lsm6dso_sample();
         
         /* Signal that sampling is complete */
         k_sem_give(&lsm6dso_sem);
         SENSORS_VERBOSE("LSM6DSO sampling complete\n");
-        
-        /* Attendre simplement que le timer expire, comme pour HTS221 */
-        k_timer_start(&lsm6dso_timer, K_SECONDS(lsm6dso_sampling_period_sec), K_NO_WAIT);
-        k_timer_status_sync(&lsm6dso_timer);
     }
 }
 
@@ -219,16 +176,6 @@ void sensors_init(void)
     k_sem_init(&lis2mdl_sem, 0, 1);
     k_sem_init(&lsm6dso_sem, 0, 1);
     
-    /* Initialiser les timers pour chaque capteur */
-    k_timer_init(&hts221_timer, hts221_timer_expiry_function, NULL);
-    k_timer_init(&lis2mdl_timer, lis2mdl_timer_expiry_function, NULL);
-    k_timer_init(&lsm6dso_timer, lsm6dso_timer_expiry_function, NULL);
-    
-    SENSORS_VERBOSE("Timers initialized: HTS221=%ds, LIS2MDL=%ds, LSM6DSO=%ds\n", 
-                    hts221_sampling_period_sec, 
-                    lis2mdl_sampling_period_sec, 
-                    lsm6dso_sampling_period_sec);
-    
     /* Initialize HTS221 temperature and humidity sensor */
     if (!my_hts221_init()) {
         SENSORS_ERROR("Failed to initialize HTS221 temperature and humidity sensor\n");
@@ -282,19 +229,9 @@ void sensors_run(void *p1, void *p2, void *p3)
     
     /* Main thread can now monitor or do other work */
     while (1) {
-        /* Monitor for all sensors independently */
-        if (k_sem_take(&hts221_sem, K_MSEC(100)) == 0) {
-            SENSORS_VERBOSE("HTS221 sensor cycle finished\n");
-        }
-        
-        if (k_sem_take(&lis2mdl_sem, K_MSEC(100)) == 0) {
-            SENSORS_VERBOSE("LIS2MDL sensor cycle finished\n");
-        }
-        
-        if (k_sem_take(&lsm6dso_sem, K_MSEC(100)) == 0) {
-            SENSORS_VERBOSE("LSM6DSO sensor cycle finished\n");
-        }
-        
+        /* Monitor for completion of full cycle */
+        k_sem_take(&lsm6dso_sem, K_FOREVER);
+        SENSORS_VERBOSE("Complete sensor cycle finished\n");
         k_sleep(K_MSEC(200));
     }
 }
