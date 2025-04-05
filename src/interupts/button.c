@@ -15,6 +15,7 @@
 #define BUTTON3_NODE DT_ALIAS(sw2)
 #define BUTTON4_NODE DT_ALIAS(sw3)
 #define BUTTON_DEBOUNCE_DELAY_MS 50
+#define BUTTON_MIN_INTERVAL_MS 200  // Temps minimum entre deux pressions
 
 /* Button GPIO device */
 static const struct gpio_dt_spec button1 = GPIO_DT_SPEC_GET(BUTTON1_NODE, gpios);
@@ -34,6 +35,13 @@ static bool display_on = true;
 
 /* Work item for debouncing button presses */
 static struct k_work_delayable button_work;
+
+/* Current active screen */
+static lv_obj_t *current_active_screen = NULL;
+
+static uint32_t last_button2_press = 0;
+static uint32_t last_button3_press = 0;
+static uint32_t last_button4_press = 0;
 
 /* Button press handler with debounce */
 static void button_pressed_work_handler(struct k_work *work)
@@ -62,22 +70,67 @@ static void button_pressed_cb(const struct device *dev, struct gpio_callback *cb
     k_work_schedule(&button_work, K_MSEC(BUTTON_DEBOUNCE_DELAY_MS));
 }
 
-/* Button 3 interrupt callback */
+/* Button 2 interrupt callback */
+static void button2_pressed_cb(const struct device *dev, struct gpio_callback *cb,
+                             uint32_t pins)
+{
+    uint32_t current_time = k_uptime_get_32();
+    if (current_time - last_button2_press < BUTTON_MIN_INTERVAL_MS) {
+        return;
+    }
+    last_button2_press = current_time;
+
+    BUTTON_VERBOSE("Button 2 pressed at %u ms\n", current_time);
+    current_active_screen = ui_Screen1;
+    _ui_screen_change(&ui_Screen1, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen1_screen_init);
+}
+
+/* Button 3 interrupt callback - Previous screen */
 static void button3_pressed_cb(const struct device *dev, struct gpio_callback *cb,
                              uint32_t pins)
 {
-    BUTTON_VERBOSE("Button 3 pressed at %u ms\n", k_uptime_get_32());
+    uint32_t current_time = k_uptime_get_32();
+    if (current_time - last_button3_press < BUTTON_MIN_INTERVAL_MS) {
+        return;
+    }
+    last_button3_press = current_time;
+
+    BUTTON_VERBOSE("Button 3 pressed at %u ms\n", current_time);
     
-    _ui_screen_change(&ui_Screen1, LV_SCR_LOAD_ANIM_FADE_ON, 50, 0, &ui_Screen1_screen_init);
+    if (current_active_screen == ui_Screen1 || current_active_screen == NULL) {
+        current_active_screen = ui_Screen3;
+        _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen3_screen_init);
+    } else if (current_active_screen == ui_Screen2) {
+        current_active_screen = ui_Screen1;
+        _ui_screen_change(&ui_Screen1, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen1_screen_init);
+    } else if (current_active_screen == ui_Screen3) {
+        current_active_screen = ui_Screen2;
+        _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
+    }
 }
 
-/* Button 4 interrupt callback */
+/* Button 4 interrupt callback - Next screen */
 static void button4_pressed_cb(const struct device *dev, struct gpio_callback *cb,
                              uint32_t pins)
 {
-    BUTTON_VERBOSE("Button 4 pressed at %u ms\n", k_uptime_get_32());
-    _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
+    uint32_t current_time = k_uptime_get_32();
+    if (current_time - last_button4_press < BUTTON_MIN_INTERVAL_MS) {
+        return;
+    }
+    last_button4_press = current_time;
+
+    BUTTON_VERBOSE("Button 4 pressed at %u ms\n", current_time);
     
+    if (current_active_screen == ui_Screen1 || current_active_screen == NULL) {
+        current_active_screen = ui_Screen2;
+        _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
+    } else if (current_active_screen == ui_Screen2) {
+        current_active_screen = ui_Screen3;
+        _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen3_screen_init);
+    } else if (current_active_screen == ui_Screen3) {
+        current_active_screen = ui_Screen1;
+        _ui_screen_change(&ui_Screen1, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen1_screen_init);
+    }
 }
 
 /* Initialize button */
@@ -128,7 +181,7 @@ int button_init(const struct device *disp_dev)
     ret = gpio_pin_interrupt_configure_dt(&button4, GPIO_INT_EDGE_TO_ACTIVE);
 
     gpio_init_callback(&button_cb_data1, button_pressed_cb, BIT(button1.pin));
-    gpio_init_callback(&button_cb_data2, button_pressed_work_handler, BIT(button2.pin));
+    gpio_init_callback(&button_cb_data2, button2_pressed_cb, BIT(button2.pin));
     gpio_init_callback(&button_cb_data3, button3_pressed_cb, BIT(button3.pin));
     gpio_init_callback(&button_cb_data4, button4_pressed_cb, BIT(button4.pin));
 

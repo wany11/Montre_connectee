@@ -18,9 +18,6 @@
 void ui_Screen1_screen_init(void);
 lv_obj_t * ui_Screen1;
 lv_obj_t * ui_Panel3;
-lv_obj_t * ui_HourLabel;
-lv_obj_t * ui_LabelSensor;
-lv_obj_t * ui_LabelTemp;
 lv_obj_t * ui_accel_x;
 lv_obj_t * ui_accel_y;
 lv_obj_t * ui_accel_z;
@@ -53,6 +50,15 @@ lv_obj_t * ui_ElevH;
 lv_obj_t * ui_TwelveH;
 // CUSTOM VARIABLES
 lv_obj_t * uic_Clock_Group;
+
+// SCREEN: ui_Screen3
+void ui_Screen3_screen_init(void);
+lv_obj_t * ui_Screen3;
+lv_obj_t * ui_Clock_Group2;
+lv_obj_t * ui_HourLabel;
+lv_obj_t * ui_LabelHumi;
+lv_obj_t * ui_LabelTemp;
+// CUSTOM VARIABLES
 
 // EVENTS
 void ui_event____initial_actions0(lv_event_t * e);
@@ -203,12 +209,12 @@ void process_queue(void)
         switch(msg.type) {
         case MSG_TYPE_TEMPERATURE:
             target_label = ui_LabelTemp;
-            format = "Temperature: %.1f °C";
+            format = " Temp\n%.1f °C";
             break;
             
         case MSG_TYPE_HUMIDITY:
-            target_label = ui_LabelSensor;
-            format = "Humidity: %.1f%%";
+            target_label = ui_LabelHumi;
+            format = " Hum\n%.1f%%";
             break;
 
         case MSG_TYPE_ACCEL_X:
@@ -276,6 +282,7 @@ void ui_init(void)
     lv_disp_set_theme(dispp, theme);
     ui_Screen1_screen_init();
     ui_Screen2_screen_init();
+    ui_Screen3_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_obj_add_event_cb(ui____initial_actions0, ui_event____initial_actions0, LV_EVENT_ALL, NULL);
 
@@ -294,8 +301,8 @@ void ui_thread_entry(void *p1, void *p2, void *p3)
         lv_label_set_text(ui_LabelTemp, "Temperature: --.- °C");
     }
     
-    if (ui_LabelSensor != NULL) {
-        lv_label_set_text(ui_LabelSensor, "Humidity: --.-%");
+    if (ui_LabelHumi != NULL) {
+        lv_label_set_text(ui_LabelHumi, "Humidity: --.-%");
     }
     
     if (ui_HourLabel != NULL) {
@@ -307,6 +314,27 @@ void ui_thread_entry(void *p1, void *p2, void *p3)
         lv_obj_t *current_screen = lv_scr_act();
         
         if (current_screen == ui_Screen1) {
+            static uint32_t last_update = 0;
+            uint32_t current_time = k_uptime_get_32();
+            
+            // Mise à jour des capteurs toutes les 500ms
+            if (current_time - last_update >= 500) {
+                process_queue();
+                last_update = current_time;
+            }
+            
+            // Mise à jour de l'heure chaque seconde
+            static uint32_t last_time_update = 0;
+            if (current_time - last_time_update >= 1000) {
+                if (ui_HourLabel != NULL) {
+                    char time_str[32];
+                    format_time(get_temps(), time_str, sizeof(time_str));
+                    lv_label_set_text(ui_HourLabel, time_str);
+                }
+                last_time_update = current_time;
+            }
+        }
+        else if (current_screen == ui_Screen3) {
             static uint32_t last_update = 0;
             uint32_t current_time = k_uptime_get_32();
             
