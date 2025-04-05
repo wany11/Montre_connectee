@@ -5,10 +5,6 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/rtc.h>
 
-#define RTC_ERROR(fmt, ...)   DEBUG_ERROR_PRINT("RTC", fmt, ##__VA_ARGS__)
-#define RTC_INFO(fmt, ...)    DEBUG_INFO_PRINT("RTC", fmt, ##__VA_ARGS__)
-#define RTC_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("RTC", fmt, ##__VA_ARGS__)
-
 static const struct device *rtc_dev;
 
 
