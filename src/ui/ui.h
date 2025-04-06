@@ -22,9 +22,6 @@ extern "C" {
 void ui_Screen1_screen_init(void);
 extern lv_obj_t * ui_Screen1;
 extern lv_obj_t * ui_Panel3;
-extern lv_obj_t * ui_HourLabel;
-extern lv_obj_t * ui_LabelSensor;
-extern lv_obj_t * ui_LabelTemp;
 extern lv_obj_t * ui_accel_x;
 extern lv_obj_t * ui_accel_y;
 extern lv_obj_t * ui_accel_z;
@@ -43,8 +40,29 @@ extern lv_obj_t * ui_Clock_Group;
 extern lv_obj_t * ui_hour;
 extern lv_obj_t * ui_min;
 extern lv_obj_t * ui_sec;
+extern lv_obj_t * ui_ThreeH;
+extern lv_obj_t * ui_SixH;
+extern lv_obj_t * ui_NineH;
+extern lv_obj_t * ui_OneH;
+extern lv_obj_t * ui_TwoH;
+extern lv_obj_t * ui_FourH;
+extern lv_obj_t * ui_FiveH;
+extern lv_obj_t * ui_SevenH;
+extern lv_obj_t * ui_EightH;
+extern lv_obj_t * ui_TenH;
+extern lv_obj_t * ui_ElevH;
+extern lv_obj_t * ui_TwelveH;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_Clock_Group;
+
+// SCREEN: ui_Screen3
+void ui_Screen3_screen_init(void);
+extern lv_obj_t * ui_Screen3;
+extern lv_obj_t * ui_Clock_Group2;
+extern lv_obj_t * ui_HourLabel;
+extern lv_obj_t * ui_LabelHumi;
+extern lv_obj_t * ui_LabelTemp;
+// CUSTOM VARIABLES
 
 // EVENTS
 

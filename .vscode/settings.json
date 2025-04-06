@@ -5,6 +5,9 @@
         "util.h": "c",
         "device.h": "c",
         "debug.h": "c",
-        "sensors.h": "c"
+        "sensors.h": "c",
+        "timsec.h": "c",
+        "button.h": "c",
+        "rtc.h": "c"
     }
 }

@@ -60,4 +60,8 @@
 #define BUTTON_INFO(fmt, ...)    DEBUG_INFO_PRINT("BUTTON", fmt, ##__VA_ARGS__)
 #define BUTTON_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("BUTTON", fmt, ##__VA_ARGS__)
 
+#define RTC_ERROR(fmt, ...)   DEBUG_ERROR_PRINT("RTC", fmt, ##__VA_ARGS__)
+#define RTC_INFO(fmt, ...)    DEBUG_INFO_PRINT("RTC", fmt, ##__VA_ARGS__)
+#define RTC_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("RTC", fmt, ##__VA_ARGS__)
+
 #endif /* DEBUG_H_ */

@@ -25,12 +25,12 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_y(ui_HourLabel, -100);
     lv_obj_set_align(ui_HourLabel, LV_ALIGN_CENTER);
 
-    ui_LabelSensor = lv_label_create(ui_Panel3);
-    lv_obj_set_width(ui_LabelSensor, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_LabelSensor, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelSensor, -85);
-    lv_obj_set_y(ui_LabelSensor, -60);
-    lv_obj_set_align(ui_LabelSensor, LV_ALIGN_CENTER);
+    ui_LabelHumi = lv_label_create(ui_Panel3);
+    lv_obj_set_width(ui_LabelHumi, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelHumi, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LabelHumi, -85);
+    lv_obj_set_y(ui_LabelHumi, -60);
+    lv_obj_set_align(ui_LabelHumi, LV_ALIGN_CENTER);
 
     ui_LabelTemp = lv_label_create(ui_Panel3);
     lv_obj_set_width(ui_LabelTemp, LV_SIZE_CONTENT);   /// 1

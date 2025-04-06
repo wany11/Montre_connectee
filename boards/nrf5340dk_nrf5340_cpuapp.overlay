@@ -1,3 +1,11 @@
+&i2c1 {
+    status = "okay";
+    rv_8263: rv-8263@51 {
+        compatible = "microcrystal,rv-8263-c8";
+        reg = <0x51>;
+        status = "okay";
+    };
+};
 / {
 int_gpio {
     compatible = "gpio-keys";

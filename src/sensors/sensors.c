@@ -11,7 +11,7 @@
 #include "../../inc/debug.h"  /* Include the debug header */
 
 /* Global sensor data structure */
-extern sensor_data_t g_sensor_data = {
+sensor_data_t g_sensor_data = {
     .accel_x = 0.0,
     .accel_y = 0.0,
     .accel_z = 0.0,

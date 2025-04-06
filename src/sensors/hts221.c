@@ -92,7 +92,7 @@ bool my_hts221_init(void)
 
     HTS221_INFO("Device found and ready\n");
     
-    HTS221_INFO("Temperature and humidity sensor initialized successfully\n");
+    // HTS221_INFO("Temperature and humidity sensor initialized successfully\n");
     return true;
 }
 

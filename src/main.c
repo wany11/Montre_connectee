@@ -16,6 +16,7 @@
 #include "../inc/debug.h"
 #include "../inc/button.h"
 #include "../inc/bluetooth.h"
+#include "../inc/rtc.h"
 
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>
@@ -98,6 +99,21 @@ int main(void)
     /* Start the timer */
     start_timer();
     printk("Timer started\n");
+
+    /* RTC initialization */
+    if (rtc_init() == 0) {
+
+        
+        /* Variables to store the read time */
+        uint16_t year;
+        uint8_t month, day, hour, minute, second;
+        
+        /* Read the current time */
+        if (rtc_get_datetime(&year, &month, &day, &hour, &minute, &second) == 0) {
+            printk("Date/time: %04d-%02d-%02d %02d:%02d:%02d\n",
+                   year, month, day, hour, minute, second);
+        }
+    }
 
     /* Main thread handles display updates */
     while (1) {
