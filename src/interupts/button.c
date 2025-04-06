@@ -81,8 +81,8 @@ static void button2_pressed_cb(const struct device *dev, struct gpio_callback *c
     last_button2_press = current_time;
 
     BUTTON_VERBOSE("Button 2 pressed at %u ms\n", current_time);
-    current_active_screen = ui_Screen1;
-    _ui_screen_change(&ui_Screen1, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen1_screen_init);
+    current_active_screen = ui_Screen2;
+    _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
 }
 
 /* Button 3 interrupt callback - Previous screen */
@@ -97,15 +97,18 @@ static void button3_pressed_cb(const struct device *dev, struct gpio_callback *c
 
     BUTTON_VERBOSE("Button 3 pressed at %u ms\n", current_time);
     
-    if (current_active_screen == ui_Screen1 || current_active_screen == NULL) {
-        current_active_screen = ui_Screen3;
-        _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen3_screen_init);
-    } else if (current_active_screen == ui_Screen2) {
-        current_active_screen = ui_Screen1;
-        _ui_screen_change(&ui_Screen1, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen1_screen_init);
+    if (current_active_screen == ui_Screen2 || current_active_screen == NULL) {
+        current_active_screen = ui_Screen5;
+        _ui_screen_change(&ui_Screen5, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen5_screen_init);
     } else if (current_active_screen == ui_Screen3) {
         current_active_screen = ui_Screen2;
         _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
+    } else if (current_active_screen == ui_Screen4) {
+        current_active_screen = ui_Screen3;
+        _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen3_screen_init);
+    } else if (current_active_screen == ui_Screen5) {
+        current_active_screen = ui_Screen4;
+        _ui_screen_change(&ui_Screen4, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen4_screen_init);
     }
 }
 
@@ -121,15 +124,18 @@ static void button4_pressed_cb(const struct device *dev, struct gpio_callback *c
 
     BUTTON_VERBOSE("Button 4 pressed at %u ms\n", current_time);
     
-    if (current_active_screen == ui_Screen1 || current_active_screen == NULL) {
-        current_active_screen = ui_Screen2;
-        _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
-    } else if (current_active_screen == ui_Screen2) {
+    if (current_active_screen == ui_Screen2 || current_active_screen == NULL) {
         current_active_screen = ui_Screen3;
         _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen3_screen_init);
     } else if (current_active_screen == ui_Screen3) {
-        current_active_screen = ui_Screen1;
-        _ui_screen_change(&ui_Screen1, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen1_screen_init);
+        current_active_screen = ui_Screen4;
+        _ui_screen_change(&ui_Screen4, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen4_screen_init);
+    } else if (current_active_screen == ui_Screen4) {
+        current_active_screen = ui_Screen5;
+        _ui_screen_change(&ui_Screen5, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen5_screen_init);
+    } else if (current_active_screen == ui_Screen5) {
+        current_active_screen = ui_Screen2;
+        _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
     }
 }
 

@@ -47,4 +47,44 @@ void ui_Screen3_screen_init(void)
     lv_obj_set_style_text_color(ui_LabelHumi, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelHumi, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_Image1 = lv_img_create(ui_Screen3);
+    lv_img_set_src(ui_Image1, &ui_img_weather_sun_cloud_png);
+    lv_obj_set_width(ui_Image1, LV_SIZE_CONTENT);   /// 37
+    lv_obj_set_height(ui_Image1, LV_SIZE_CONTENT);    /// 30
+    lv_obj_set_x(ui_Image1, 0);
+    lv_obj_set_y(ui_Image1, 61);
+    lv_obj_set_align(ui_Image1, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Image1, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_Image2 = lv_img_create(ui_Screen3);
+    lv_img_set_src(ui_Image2, &ui_img_weather_sun_png);
+    lv_obj_set_width(ui_Image2, LV_SIZE_CONTENT);   /// 28
+    lv_obj_set_height(ui_Image2, LV_SIZE_CONTENT);    /// 28
+    lv_obj_set_x(ui_Image2, 0);
+    lv_obj_set_y(ui_Image2, 61);
+    lv_obj_set_align(ui_Image2, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Image2, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_Image2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_Image3 = lv_img_create(ui_Screen3);
+    lv_img_set_src(ui_Image3, &ui_img_weather_cloud_fog_png);
+    lv_obj_set_width(ui_Image3, LV_SIZE_CONTENT);   /// 37
+    lv_obj_set_height(ui_Image3, LV_SIZE_CONTENT);    /// 29
+    lv_obj_set_x(ui_Image3, 0);
+    lv_obj_set_y(ui_Image3, 61);
+    lv_obj_set_align(ui_Image3, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Image3, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_Image3, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_Image4 = lv_img_create(ui_Screen3);
+    lv_img_set_src(ui_Image4, &ui_img_weather_cloud_png);
+    lv_obj_set_width(ui_Image4, LV_SIZE_CONTENT);   /// 37
+    lv_obj_set_height(ui_Image4, LV_SIZE_CONTENT);    /// 30
+    lv_obj_set_x(ui_Image4, 0);
+    lv_obj_set_y(ui_Image4, 61);
+    lv_obj_set_align(ui_Image4, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Image4, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_Image4, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
 }

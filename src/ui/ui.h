@@ -18,21 +18,6 @@ extern "C" {
 #include "ui_events.h"
 
 
-// SCREEN: ui_Screen1
-void ui_Screen1_screen_init(void);
-extern lv_obj_t * ui_Screen1;
-extern lv_obj_t * ui_Panel3;
-extern lv_obj_t * ui_accel_x;
-extern lv_obj_t * ui_accel_y;
-extern lv_obj_t * ui_accel_z;
-extern lv_obj_t * ui_gyro_x;
-extern lv_obj_t * ui_gyro_y;
-extern lv_obj_t * ui_gyro_z;
-extern lv_obj_t * ui_mag_x;
-extern lv_obj_t * ui_mag_y;
-extern lv_obj_t * ui_mag_z;
-// CUSTOM VARIABLES
-
 // SCREEN: ui_Screen2
 void ui_Screen2_screen_init(void);
 extern lv_obj_t * ui_Screen2;
@@ -62,6 +47,34 @@ extern lv_obj_t * ui_Clock_Group2;
 extern lv_obj_t * ui_HourLabel;
 extern lv_obj_t * ui_LabelHumi;
 extern lv_obj_t * ui_LabelTemp;
+extern lv_obj_t * ui_Image1;
+extern lv_obj_t * ui_Image2;
+extern lv_obj_t * ui_Image3;
+extern lv_obj_t * ui_Image4;
+// CUSTOM VARIABLES
+
+// SCREEN: ui_Screen4
+void ui_Screen4_screen_init(void);
+extern lv_obj_t * ui_Screen4;
+extern lv_obj_t * ui_Clock_Group1;
+extern lv_obj_t * ui_Accelerometre;
+extern lv_obj_t * ui_accel_x;
+extern lv_obj_t * ui_accel_y;
+extern lv_obj_t * ui_accel_z;
+extern lv_obj_t * ui_Gyroscope;
+extern lv_obj_t * ui_gyro_x;
+extern lv_obj_t * ui_gyro_y;
+extern lv_obj_t * ui_gyro_z;
+// CUSTOM VARIABLES
+
+// SCREEN: ui_Screen5
+void ui_Screen5_screen_init(void);
+extern lv_obj_t * ui_Screen5;
+extern lv_obj_t * ui_Clock_Group3;
+extern lv_obj_t * ui_Magnetisme;
+extern lv_obj_t * ui_mag_x;
+extern lv_obj_t * ui_mag_y;
+extern lv_obj_t * ui_mag_z;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -74,6 +87,10 @@ LV_IMG_DECLARE(ui_img_1780325426);    // assets/Capture d'écran 2025-03-21 1135
 LV_IMG_DECLARE(ui_img_clockwise_hour_png);    // assets/clockwise_hour.png
 LV_IMG_DECLARE(ui_img_clockwise_min_png);    // assets/clockwise_min.png
 LV_IMG_DECLARE(ui_img_clockwise_sec_png);    // assets/clockwise_sec.png
+LV_IMG_DECLARE(ui_img_weather_sun_cloud_png);    // assets/weather_sun_cloud.png
+LV_IMG_DECLARE(ui_img_weather_sun_png);    // assets/weather_sun.png
+LV_IMG_DECLARE(ui_img_weather_cloud_fog_png);    // assets/weather_cloud_fog.png
+LV_IMG_DECLARE(ui_img_weather_cloud_png);    // assets/weather_cloud.png
 
 // UI INIT
 void ui_init(void);

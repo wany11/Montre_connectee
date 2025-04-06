@@ -13,22 +13,6 @@
 
 ///////////////////// VARIABLES ////////////////////
 
-
-// SCREEN: ui_Screen1
-void ui_Screen1_screen_init(void);
-lv_obj_t * ui_Screen1;
-lv_obj_t * ui_Panel3;
-lv_obj_t * ui_accel_x;
-lv_obj_t * ui_accel_y;
-lv_obj_t * ui_accel_z;
-lv_obj_t * ui_gyro_x;
-lv_obj_t * ui_gyro_y;
-lv_obj_t * ui_gyro_z;
-lv_obj_t * ui_mag_x;
-lv_obj_t * ui_mag_y;
-lv_obj_t * ui_mag_z;
-// CUSTOM VARIABLES
-
 // SCREEN: ui_Screen2
 void ui_Screen2_screen_init(void);
 lv_obj_t * ui_Screen2;
@@ -58,6 +42,34 @@ lv_obj_t * ui_Clock_Group2;
 lv_obj_t * ui_HourLabel;
 lv_obj_t * ui_LabelHumi;
 lv_obj_t * ui_LabelTemp;
+lv_obj_t * ui_Image1;
+lv_obj_t * ui_Image2;
+lv_obj_t * ui_Image3;
+lv_obj_t * ui_Image4;
+// CUSTOM VARIABLES
+
+// SCREEN: ui_Screen4
+void ui_Screen4_screen_init(void);
+lv_obj_t * ui_Screen4;
+lv_obj_t * ui_Clock_Group1;
+lv_obj_t * ui_Accelerometre;
+lv_obj_t * ui_accel_x;
+lv_obj_t * ui_accel_y;
+lv_obj_t * ui_accel_z;
+lv_obj_t * ui_Gyroscope;
+lv_obj_t * ui_gyro_x;
+lv_obj_t * ui_gyro_y;
+lv_obj_t * ui_gyro_z;
+// CUSTOM VARIABLES
+
+// SCREEN: ui_Screen5
+void ui_Screen5_screen_init(void);
+lv_obj_t * ui_Screen5;
+lv_obj_t * ui_Clock_Group3;
+lv_obj_t * ui_Magnetisme;
+lv_obj_t * ui_mag_x;
+lv_obj_t * ui_mag_y;
+lv_obj_t * ui_mag_z;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -170,6 +182,41 @@ void init_clock_positions(void)
     }
 }
 
+// Ajouter ces variables globales au début du fichier
+static float current_temperature = 0.0f;
+static float current_humidity = 0.0f;
+
+// Ajouter cette fonction après les déclarations des variables
+static void update_weather_image(void) {
+    // Cache toutes les images par défaut
+    if (ui_Image1) lv_obj_add_flag(ui_Image1, LV_OBJ_FLAG_HIDDEN);  // sun_cloud
+    if (ui_Image2) lv_obj_add_flag(ui_Image2, LV_OBJ_FLAG_HIDDEN);  // sun
+    if (ui_Image3) lv_obj_add_flag(ui_Image3, LV_OBJ_FLAG_HIDDEN);  // cloud_fog
+    if (ui_Image4) lv_obj_add_flag(ui_Image4, LV_OBJ_FLAG_HIDDEN);  // cloud
+
+    // Sélectionne l'image appropriée en fonction des conditions
+    lv_obj_t *selected_image = NULL;
+
+    if (current_humidity >= 80 && current_temperature < 20) {
+        // Humide et frais -> brumeux
+        selected_image = ui_Image3;  // cloud_fog
+    } else if (current_temperature >= 25 && current_humidity < 60) {
+        // Chaud et sec -> très ensoleillé
+        selected_image = ui_Image2;  // sun
+    } else if (current_temperature >= 20 && current_humidity < 70) {
+        // Température modérée -> partiellement nuageux
+        selected_image = ui_Image1;  // sun_cloud
+    } else {
+        // Autres conditions -> nuageux
+        selected_image = ui_Image4;  // cloud
+    }
+
+    // Affiche l'image sélectionnée
+    if (selected_image) {
+        lv_obj_clear_flag(selected_image, LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
 ///////////////////// FUNCTIONS ////////////////////
 void ui_event____initial_actions0(lv_event_t * e)
 {
@@ -210,62 +257,70 @@ void process_queue(void)
         case MSG_TYPE_TEMPERATURE:
             target_label = ui_LabelTemp;
             format = " Temp\n%.1f °C";
+            current_temperature = msg.value;
             break;
             
         case MSG_TYPE_HUMIDITY:
             target_label = ui_LabelHumi;
             format = " Hum\n%.1f%%";
+            current_humidity = msg.value;
             break;
 
         case MSG_TYPE_ACCEL_X:
             target_label = ui_accel_x;
-            format = "Accel X: %.2f";
+            format = "X: %.2f";
             break;
 
         case MSG_TYPE_ACCEL_Y:
             target_label = ui_accel_y;
-            format = "Accel Y: %.2f";
+            format = "Y: %.2f";
             break;
 
         case MSG_TYPE_ACCEL_Z:
             target_label = ui_accel_z;
-            format = "Accel Z: %.2f";
+            format = "Z: %.2f";
             break;
 
         case MSG_TYPE_GYRO_X:
             target_label = ui_gyro_x;
-            format = "Gyro X: %.2f";
+            format = "X: %.2f";
             break;
 
         case MSG_TYPE_GYRO_Y:
             target_label = ui_gyro_y;
-            format = "Gyro Y: %.2f";
+            format = "Y: %.2f";
             break;
 
         case MSG_TYPE_GYRO_Z:
             target_label = ui_gyro_z;
-            format = "Gyro Z: %.2f";
+            format = "Z: %.2f";
             break;
 
         case MSG_TYPE_MAG_X:
             target_label = ui_mag_x;
-            format = "Mag X: %.2f";
+            format = "X: %.2f";
             break;
 
         case MSG_TYPE_MAG_Y:
             target_label = ui_mag_y;
-            format = "Mag Y: %.2f";
+            format = "Y: %.2f";
             break;
 
         case MSG_TYPE_MAG_Z:
             target_label = ui_mag_z;
-            format = "Mag Z: %.2f";
+            format = "Z: %.2f";
             break;
         }
         
         if (target_label != NULL && format != NULL) {
             lv_snprintf(buffer, sizeof(buffer), format, msg.value);
             lv_label_set_text(target_label, buffer);
+        }
+
+        // Mettre à jour l'image météo si on est sur l'écran 3
+        lv_obj_t *current_screen = lv_scr_act();
+        if (current_screen == ui_Screen3) {
+            update_weather_image();
         }
     }
 }
@@ -280,14 +335,15 @@ void ui_init(void)
     lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
                                                false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
-    ui_Screen1_screen_init();
     ui_Screen2_screen_init();
     ui_Screen3_screen_init();
+    ui_Screen4_screen_init();
+    ui_Screen5_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_obj_add_event_cb(ui____initial_actions0, ui_event____initial_actions0, LV_EVENT_ALL, NULL);
 
     lv_disp_load_scr(ui____initial_actions0);
-    lv_disp_load_scr(ui_Screen1);
+    lv_disp_load_scr(ui_Screen2);
     
     printk("UI initialization completed\n");
 }
@@ -309,43 +365,25 @@ void ui_thread_entry(void *p1, void *p2, void *p3)
         lv_label_set_text(ui_HourLabel, "00:00:00");
     }
 
+    uint32_t last_sensor_update = 0;
+    uint32_t last_time_update = 0;
+
     while (1) {
-        /* Check which screen is active */
         lv_obj_t *current_screen = lv_scr_act();
+        uint32_t current_time = k_uptime_get_32();
         
-        if (current_screen == ui_Screen1) {
-            static uint32_t last_update = 0;
-            uint32_t current_time = k_uptime_get_32();
-            
-            // Mise à jour des capteurs toutes les 500ms
-            if (current_time - last_update >= 500) {
+        // Mise à jour des capteurs toutes les 100ms
+        if (current_time - last_sensor_update >= 100) {
+            if (current_screen == ui_Screen3 ||
+                current_screen == ui_Screen4 ||
+                current_screen == ui_Screen5) {
                 process_queue();
-                last_update = current_time;
             }
-            
-            // Mise à jour de l'heure chaque seconde
-            static uint32_t last_time_update = 0;
-            if (current_time - last_time_update >= 1000) {
-                if (ui_HourLabel != NULL) {
-                    char time_str[32];
-                    format_time(get_temps(), time_str, sizeof(time_str));
-                    lv_label_set_text(ui_HourLabel, time_str);
-                }
-                last_time_update = current_time;
-            }
+            last_sensor_update = current_time;
         }
-        else if (current_screen == ui_Screen3) {
-            static uint32_t last_update = 0;
-            uint32_t current_time = k_uptime_get_32();
-            
-            // Mise à jour des capteurs toutes les 500ms
-            if (current_time - last_update >= 500) {
-                process_queue();
-                last_update = current_time;
-            }
-            
-            // Mise à jour de l'heure chaque seconde
-            static uint32_t last_time_update = 0;
+        
+        // Mise à jour de l'heure chaque seconde (uniquement pour Screen3)
+        if (current_screen == ui_Screen3) {
             if (current_time - last_time_update >= 1000) {
                 if (ui_HourLabel != NULL) {
                     char time_str[32];
