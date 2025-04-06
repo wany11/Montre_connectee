@@ -148,23 +148,10 @@
  
      LSM6DSO_INFO("Device found and ready\n");
  
-     if (set_sampling_freq(lsm6dso_dev) != 0) {
-         LSM6DSO_ERROR("Failed to set sampling frequency\n");
-         return false;
-     }
- 
- #ifdef CONFIG_LSM6DSO_TRIGGER
-     LSM6DSO_INFO("Setting up trigger\n");
-     struct sensor_trigger trig = {
-         .type = SENSOR_TRIG_DATA_READY,
-         .chan = SENSOR_CHAN_ACCEL_XYZ,
-     };
-     if (sensor_trigger_set(lsm6dso_dev, &trig, lsm6dso_handler) < 0) {
-         LSM6DSO_ERROR("Cannot configure trigger\n");
-         return false;
-     }
-     LSM6DSO_INFO("Trigger configured successfully\n");
- #endif
+    //  if (set_sampling_freq(lsm6dso_dev) != 0) {
+    //      LSM6DSO_ERROR("Failed to set sampling frequency\n");
+    //      return false;
+    //  }
      
      LSM6DSO_INFO("Accelerometer and gyroscope initialized successfully\n");
      return true;

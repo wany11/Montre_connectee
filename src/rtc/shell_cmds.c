@@ -2,7 +2,7 @@
 #include <zephyr/shell/shell.h>
 #include <stdlib.h> 
 #include <string.h>
-#include "../inc/rtc.h"
+#include "../../inc/rtc.h"
 
 /* ****************************** */
 /*          Commande RTC          */

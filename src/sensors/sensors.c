@@ -9,6 +9,7 @@
 #include "../../inc/lsm6dso.h"
 #include "../../inc/lis2mdl.h"
 #include "../../inc/debug.h"  /* Include the debug header */
+#include "../../inc/sensorTimers.h"
 
 /* Global sensor data structure */
 sensor_data_t g_sensor_data = {
@@ -52,11 +53,12 @@ static k_tid_t lsm6dso_tid;
 static void hts221_thread_func(void *p1, void *p2, void *p3)
 {
     while (1) {
+        /* Wait for timer signal via semaphore */
+        k_sem_take(&hts221_sem, K_FOREVER);
+        
         SENSORS_VERBOSE("Starting HTS221 sampling\n");
         hts221_sample();
         
-        /* Signal that sampling is complete */
-        k_sem_give(&hts221_sem);
         SENSORS_VERBOSE("HTS221 sampling complete\n");
     }
 }
@@ -64,14 +66,12 @@ static void hts221_thread_func(void *p1, void *p2, void *p3)
 static void lis2mdl_thread_func(void *p1, void *p2, void *p3)
 {
     while (1) {
-        /* Wait for HTS221 to complete */
-        k_sem_take(&hts221_sem, K_FOREVER);
+        /* Wait for timer signal via semaphore */
+        k_sem_take(&lis2mdl_sem, K_FOREVER);
         
         SENSORS_VERBOSE("Starting LIS2MDL sampling\n");
         lis2mdl_sample();
         
-        /* Signal that sampling is complete */
-        k_sem_give(&lis2mdl_sem);
         SENSORS_VERBOSE("LIS2MDL sampling complete\n");
     }
 }
@@ -79,14 +79,12 @@ static void lis2mdl_thread_func(void *p1, void *p2, void *p3)
 static void lsm6dso_thread_func(void *p1, void *p2, void *p3)
 {
     while (1) {
-        /* Wait for LIS2MDL to complete */
-        k_sem_take(&lis2mdl_sem, K_FOREVER);
+        /* Wait for timer signal via semaphore */
+        k_sem_take(&lsm6dso_sem, K_FOREVER);
         
         SENSORS_VERBOSE("Starting LSM6DSO sampling\n");
         lsm6dso_sample();
         
-        /* Signal that sampling is complete */
-        k_sem_give(&lsm6dso_sem);
         SENSORS_VERBOSE("LSM6DSO sampling complete\n");
     }
 }
@@ -195,6 +193,9 @@ void sensors_init(void)
         SENSORS_INFO("LIS2MDL initialized successfully\n");
     }
     
+    /* Initialize sensor timers */
+    init_sensor_timers();
+    
     /* Create sensor threads */
     hts221_tid = k_thread_create(&hts221_thread_data, hts221_stack, STACK_SIZE,
                                 hts221_thread_func, NULL, NULL, NULL,
@@ -207,6 +208,9 @@ void sensors_init(void)
     lsm6dso_tid = k_thread_create(&lsm6dso_thread_data, lsm6dso_stack, STACK_SIZE,
                                  lsm6dso_thread_func, NULL, NULL, NULL,
                                  5, 0, K_NO_WAIT);
+                                 
+    /* Start sensor timers */
+    start_sensor_timers();
 }
 
 /* Modified sensors_run to monitor threads instead of executing them */
@@ -227,11 +231,28 @@ void sensors_run(void *p1, void *p2, void *p3)
     
     SENSORS_INFO("Sensors initialized successfully\n");
     
-    /* Main thread can now monitor or do other work */
+    /* Main sensors thread just sleeps - timers control everything */
     while (1) {
-        /* Monitor for completion of full cycle */
-        k_sem_take(&lsm6dso_sem, K_FOREVER);
-        SENSORS_VERBOSE("Complete sensor cycle finished\n");
-        k_sleep(K_MSEC(200));
+        /* Sleep for a while */
+        k_sleep(K_SECONDS(5));
+        SENSORS_VERBOSE("Sensors thread monitoring - all sensors running\n");
     }
+}
+
+// Add function to get semaphore
+struct k_sem *get_hts221_sem(void)
+{
+    return &hts221_sem;
+}
+
+// Add function to get LIS2MDL semaphore
+struct k_sem *get_lis2mdl_sem(void)
+{
+    return &lis2mdl_sem;
+}
+
+// Add function to get LSM6DSO semaphore
+struct k_sem *get_lsm6dso_sem(void)
+{
+    return &lsm6dso_sem;
 }

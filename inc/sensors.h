@@ -45,4 +45,25 @@ void sensors_init(void);
  */
 void sensors_run(void *p1, void *p2, void *p3);
 
+/**
+ * @brief Get HTS221 semaphore for signaling
+ * 
+ * @return Pointer to the HTS221 semaphore
+ */
+struct k_sem *get_hts221_sem(void);
+
+/**
+ * @brief Get LIS2MDL semaphore for signaling
+ * 
+ * @return Pointer to the LIS2MDL semaphore
+ */
+struct k_sem *get_lis2mdl_sem(void);
+
+/**
+ * @brief Get LSM6DSO semaphore for signaling
+ * 
+ * @return Pointer to the LSM6DSO semaphore
+ */
+struct k_sem *get_lsm6dso_sem(void);
+
 #endif /* SENSORS_H */

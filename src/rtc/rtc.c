@@ -1,5 +1,5 @@
-#include "../inc/rtc.h"
-#include "../inc/debug.h"
+#include "../../inc/rtc.h"
+#include "../../inc/debug.h"
 
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>

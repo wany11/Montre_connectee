@@ -111,23 +111,10 @@
  
      LIS2MDL_INFO("Device found and ready\n");
  
-     if (set_sampling_freq(lis2mdl_dev) != 0) {
-         LIS2MDL_ERROR("Failed to set sampling frequency\n");
-         return false;
-     }
- 
- #ifdef CONFIG_LIS2MDL_TRIGGER
-     LIS2MDL_INFO("Setting up trigger\n");
-     struct sensor_trigger trig = {
-         .type = SENSOR_TRIG_DATA_READY,
-         .chan = SENSOR_CHAN_MAGN_XYZ,
-     };
-     if (sensor_trigger_set(lis2mdl_dev, &trig, lis2mdl_handler) < 0) {
-         LIS2MDL_ERROR("Cannot configure trigger\n");
-         return false;
-     }
-     LIS2MDL_INFO("Trigger configured successfully\n");
- #endif
+    //  if (set_sampling_freq(lis2mdl_dev) != 0) {
+    //      LIS2MDL_ERROR("Failed to set sampling frequency\n");
+    //      return false;
+    //  }
      
      LIS2MDL_INFO("Magnetometer initialized successfully\n");
      return true;
