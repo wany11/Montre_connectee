@@ -1,0 +1,8 @@
+/ {
+int_gpio {
+    compatible = "gpio-keys";
+    arduino_d2: arduinod2 {
+    gpios = <&arduino_header 8 GPIO_ACTIVE_LOW>;
+        };
+    };
+};    

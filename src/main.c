@@ -25,10 +25,13 @@ LOG_MODULE_REGISTER(app);
 /* Thread stacks */
 #define UI_THREAD_STACK_SIZE 2048
 #define SENSOR_THREAD_STACK_SIZE 4096
+#define BLE_THREAD_STACK_SIZE 4096
+
 
 /* Thread priorities */
 #define UI_THREAD_PRIORITY 5
 #define SENSOR_THREAD_PRIORITY 5
+#define BLE_THREAD_PRIORITY 5
 
 #define MAX_SENSOR_MSGS 40
 K_MSGQ_DEFINE(msgq, sizeof(sensor_msg_t), MAX_SENSOR_MSGS, 4);
@@ -43,8 +46,8 @@ K_THREAD_DEFINE(ui_thread_id, UI_THREAD_STACK_SIZE, ui_thread_entry, NULL, NULL,
 K_THREAD_DEFINE(sensor_thread_id, SENSOR_THREAD_STACK_SIZE, sensors_run, NULL, NULL, NULL,
                 SENSOR_THREAD_PRIORITY, 0, 500);
 
-K_THREAD_DEFINE(bluetooth_thread_id, SENSOR_THREAD_STACK_SIZE, bluetooth_run, NULL, NULL, NULL,
-                SENSOR_THREAD_PRIORITY, 0, 1000);
+K_THREAD_DEFINE(bluetooth_thread_id, BLE_THREAD_STACK_SIZE, bluetooth_run, NULL, NULL, NULL,
+                BLE_THREAD_PRIORITY, 0, 1000);
 
 struct k_msgq* get_msgq(void)
 {

@@ -45,16 +45,4 @@ void sensors_init(void);
  */
 void sensors_run(void *p1, void *p2, void *p3);
 
-/* HTS221 temperature and humidity sensor interface */
-bool my_hts221_init(void);
-void hts221_sample(void);
-
-/* LSM6DSO accelerometer and gyroscope sensor interface */
-bool my_lsm6dso_init(void);
-void lsm6dso_sample(void);
-
-/* LIS2MDL magnetometer sensor interface */
-bool my_lis2mdl_init(void);
-void lis2mdl_sample(void);
-
 #endif /* SENSORS_H */
