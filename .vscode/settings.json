@@ -8,6 +8,7 @@
         "sensors.h": "c",
         "timsec.h": "c",
         "button.h": "c",
-        "rtc.h": "c"
+        "rtc.h": "c",
+        "touch_screen.h": "c"
     }
 }

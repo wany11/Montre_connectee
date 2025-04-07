@@ -17,6 +17,7 @@
 #include "../inc/button.h"
 #include "../inc/bluetooth.h"
 #include "../inc/rtc.h"
+#include "../inc/touch_screen.h"
 
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>
@@ -73,6 +74,14 @@ int main(void)
         /* Continue anyway, as this is not critical */
     }
 
+    /* Initialize touchscreen */
+    if (touch_screen_init() != 0) {
+        MAIN_ERROR("Touchscreen initialization failed\n");
+        /* Continue anyway, as this might not be critical */
+    } else {
+        MAIN_INFO("Touchscreen initialized\n");
+    }
+
     /* Initialize UI */
     ui_init();
     MAIN_INFO("UI initialized\n");
@@ -115,10 +124,13 @@ int main(void)
         }
     }
 
-    /* Main thread handles display updates */
+    /* Main loop */
     while (1) {
-        uint32_t sleep_ms = lv_timer_handler();
-        k_msleep(MIN(sleep_ms, 20)); /* Limit to max 50 FPS */
+        /* Process touchscreen events */
+        uint32_t sleep_ms = touch_screen_process();
+        
+        /* Limit to max 50 FPS */
+        k_msleep(MIN(sleep_ms, 20));
     }
 
     return 0;

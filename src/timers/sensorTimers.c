@@ -61,11 +61,11 @@ void start_sensor_timers(void)
     SENSORS_INFO("HTS221 timer started with 30-second intervals\n");
     
     /* Start LIS2MDL timer with 5-second intervals */
-    k_timer_start(&lis2mdl_timer, K_SECONDS(2), K_SECONDS(5));
+    k_timer_start(&lis2mdl_timer, K_SECONDS(2), K_SECONDS(1));
     SENSORS_INFO("LIS2MDL timer started with 5-second intervals\n");
     
     /* Start LSM6DSO timer with 1-second intervals */
-    k_timer_start(&lsm6dso_timer, K_SECONDS(3), K_SECONDS(5));
+    k_timer_start(&lsm6dso_timer, K_SECONDS(3), K_SECONDS(1));
     SENSORS_INFO("LSM6DSO timer started with 1-second intervals\n");
 }
 
