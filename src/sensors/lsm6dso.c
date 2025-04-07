@@ -148,10 +148,10 @@
  
      LSM6DSO_INFO("Device found and ready\n");
  
-    //  if (set_sampling_freq(lsm6dso_dev) != 0) {
-    //      LSM6DSO_ERROR("Failed to set sampling frequency\n");
-    //      return false;
-    //  }
+     if (set_sampling_freq(lsm6dso_dev) != 0) {
+         LSM6DSO_ERROR("Failed to set sampling frequency\n");
+         return false;
+     }
      
      LSM6DSO_INFO("Accelerometer and gyroscope initialized successfully\n");
      return true;
