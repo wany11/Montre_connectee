@@ -18,6 +18,7 @@
 #include "../inc/bluetooth.h"
 #include "../inc/rtc.h"
 #include "../inc/touch_screen.h"
+#include "ui/screens/ui_Screen2.h"
 
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>
@@ -55,6 +56,9 @@ struct k_msgq* get_msgq(void)
 {
     return &msgq;
 }
+
+/* Declare the external function */
+extern void ui_update_analog_clock(void);
 
 int main(void)
 {
@@ -128,6 +132,9 @@ int main(void)
     while (1) {
         /* Process touchscreen events */
         uint32_t sleep_ms = touch_screen_process();
+        
+        /* Update analog clock */
+        ui_update_analog_clock();
         
         /* Limit to max 50 FPS */
         k_msleep(MIN(sleep_ms, 20));
