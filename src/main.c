@@ -110,27 +110,47 @@ int main(void)
     printk("Timer started\n");
 
     /* RTC initialization */
-    if (rtc_init() == 0) {
+    int ret;
+    uint16_t year;
+    uint8_t month, day, hour, minute, second;
 
-        
-        /* Variables to store the read time */
-        uint16_t year;
-        uint8_t month, day, hour, minute, second;
-        
-        /* Read the current time */
-        if (rtc_get_datetime(&year, &month, &day, &hour, &minute, &second) == 0) {
-            printk("Date/time: %04d-%02d-%02d %02d:%02d:%02d\n",
-                   year, month, day, hour, minute, second);
-        }
+    printk("Démarrage de l'application Montre Connectée\n");
+    
+    ret = rtc_init();
+    if (ret != 0) {
+        printk("Échec de l'initialisation du RTC: %d\n", ret);
+        return 0;
+    }
+    
+    ret = rtc_set_datetime(2025, 4, 7, 12, 0, 0);
+    if (ret != 0) {
+        printk("Échec de la configuration de la date et l'heure: %d\n", ret);
+        return 0;
     }
 
     /* Main loop */
     while (1) {
-        /* Process touchscreen events */
-        uint32_t sleep_ms = touch_screen_process();
+        /* Read the current time */
+        ret = rtc_get_datetime(&year, &month, &day, &hour, &minute, &second);
+        if (ret == 0) {
+            printk("Heure actuelle: %04d-%02d-%02d %02d:%02d:%02d\n",
+                   year, month, day, hour, minute, second);
+        } else {
+            printk("Échec de la lecture de l'heure: %d\n", ret);
+        }
+
+        uint32_t sleep_ms = lv_timer_handler();
+        k_msleep(MIN(sleep_ms, 20)); /* Limit to max 50 FPS */
+
+        /* Wait before the next RTC read */
+        k_msleep(1000);
+
+
+        // /* Process touchscreen events */
+        // uint32_t sleep_ms = touch_screen_process();
         
-        /* Limit to max 50 FPS */
-        k_msleep(MIN(sleep_ms, 20));
+        // /* Limit to max 50 FPS */
+        // k_msleep(MIN(sleep_ms, 20));
     }
 
     return 0;
