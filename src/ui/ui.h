@@ -75,6 +75,7 @@ extern lv_obj_t * ui_Magnetisme;
 extern lv_obj_t * ui_mag_x;
 extern lv_obj_t * ui_mag_y;
 extern lv_obj_t * ui_mag_z;
+extern lv_obj_t * ui_compass;
 // CUSTOM VARIABLES
 
 // EVENTS

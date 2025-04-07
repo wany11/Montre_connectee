@@ -56,4 +56,14 @@ void ui_Screen5_screen_init(void)
     lv_obj_set_style_text_color(ui_mag_z, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_mag_z, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_compass = lv_label_create(ui_Screen5);
+    lv_obj_set_width(ui_compass, LV_SIZE_CONTENT);   /// 5
+    lv_obj_set_height(ui_compass, LV_SIZE_CONTENT);    /// 100
+    lv_obj_set_x(ui_compass, 0);
+    lv_obj_set_y(ui_compass, 25);
+    lv_obj_set_align(ui_compass, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_color(ui_compass, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_compass, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_compass, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
 }

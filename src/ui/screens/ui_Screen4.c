@@ -92,5 +92,4 @@ void ui_Screen4_screen_init(void)
     lv_obj_set_align(ui_gyro_z, LV_ALIGN_CENTER);
     lv_obj_set_style_text_color(ui_gyro_z, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_gyro_z, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
 }

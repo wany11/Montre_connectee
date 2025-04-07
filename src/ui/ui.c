@@ -70,6 +70,7 @@ lv_obj_t * ui_Magnetisme;
 lv_obj_t * ui_mag_x;
 lv_obj_t * ui_mag_y;
 lv_obj_t * ui_mag_z;
+lv_obj_t * ui_compass;
 // CUSTOM VARIABLES
 
 // EVENTS
@@ -186,6 +187,22 @@ void init_clock_positions(void)
 static float current_temperature = 0.0f;
 static float current_humidity = 0.0f;
 
+// Ajouter au début du fichier avec les autres variables globales
+typedef enum {
+    COMPASS_N,
+    COMPASS_NE,
+    COMPASS_E,
+    COMPASS_SE,
+    COMPASS_S,
+    COMPASS_SW,
+    COMPASS_W,
+    COMPASS_NW
+} compass_direction_t;
+
+static float mag_x_value = 0.0f;
+static float mag_y_value = 0.0f;
+static compass_direction_t compass_pos = COMPASS_N;
+
 // Ajouter cette fonction après les déclarations des variables
 static void update_weather_image(void) {
     // Cache toutes les images par défaut
@@ -214,6 +231,53 @@ static void update_weather_image(void) {
     // Affiche l'image sélectionnée
     if (selected_image) {
         lv_obj_clear_flag(selected_image, LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
+// Ajouter cette fonction après les autres fonctions
+static const char* get_compass_direction_str(compass_direction_t dir) {
+    switch (dir) {
+        case COMPASS_N:  return "N";
+        case COMPASS_NE: return "NE";
+        case COMPASS_E:  return "E";
+        case COMPASS_SE: return "SE";
+        case COMPASS_S:  return "S";
+        case COMPASS_SW: return "SW";
+        case COMPASS_W:  return "W";
+        case COMPASS_NW: return "NW";
+        default:         return "?";
+    }
+}
+
+static void update_compass_direction(void) {
+    float angle = atan2f(mag_y_value, mag_x_value) * 180.0f / 3.14159f;
+    
+    if (angle < 0) {
+        angle += 360.0f;
+    }
+    
+    // Décalage des directions (W devient N, NW devient NE, etc.)
+    if (mag_y_value >= -0.66 && mag_y_value <= -0.60 && mag_x_value >= 0 && mag_x_value <= -0.30) {
+        compass_pos = COMPASS_N;
+    } else if (angle >= 22.5f && angle < 67.5f) {
+        compass_pos = COMPASS_NW;      // Était COMPASS_NE
+    } else if (angle >= 67.5f && angle < 112.5f) {
+        compass_pos = COMPASS_N;       // Était COMPASS_E
+    } else if (angle >= 112.5f && angle < 157.5f) {
+        compass_pos = COMPASS_NE;      // Était COMPASS_SE
+    } else if (angle >= 157.5f && angle < 202.5f) {
+        compass_pos = COMPASS_E;       // Était COMPASS_S
+    } else if (angle >= 202.5f && angle < 247.5f) {
+        compass_pos = COMPASS_SE;      // Était COMPASS_SW
+    } else if (angle >= 247.5f && angle < 292.5f) {
+        compass_pos = COMPASS_S;       // Était COMPASS_W
+    } else {
+        compass_pos = COMPASS_SW;      // Était COMPASS_NW
+    }
+
+    lv_obj_t *current_screen = lv_scr_act();
+    if (current_screen == ui_Screen5 && ui_compass != NULL) {
+        lv_label_set_text(ui_compass, get_compass_direction_str(compass_pos));
     }
 }
 
@@ -299,11 +363,15 @@ void process_queue(void)
         case MSG_TYPE_MAG_X:
             target_label = ui_mag_x;
             format = "X: %.2f";
+            mag_x_value = msg.value;
+            update_compass_direction();  // Mettre à jour la direction après chaque nouvelle valeur X
             break;
 
         case MSG_TYPE_MAG_Y:
             target_label = ui_mag_y;
             format = "Y: %.2f";
+            mag_y_value = msg.value;
+            update_compass_direction();  // Mettre à jour la direction après chaque nouvelle valeur Y
             break;
 
         case MSG_TYPE_MAG_Z:
