@@ -73,6 +73,16 @@ lv_obj_t * ui_mag_z;
 lv_obj_t * ui_compass;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_Screen6
+void ui_Screen6_screen_init(void);
+lv_obj_t * ui_Screen6;
+lv_obj_t * ui_Clock_Group4;
+lv_obj_t * ui_Chronometre;
+lv_obj_t * ui_chronometreActi;
+lv_obj_t * ui_distance;
+lv_obj_t * ui_test;
+// CUSTOM VARIABLES
+
 // EVENTS
 void ui_event____initial_actions0(lv_event_t * e);
 lv_obj_t * ui____initial_actions0;
@@ -250,29 +260,31 @@ static const char* get_compass_direction_str(compass_direction_t dir) {
 }
 
 static void update_compass_direction(void) {
+    // Calculer l'angle entre -180 et 180 degrés
     float angle = atan2f(mag_y_value, mag_x_value) * 180.0f / 3.14159f;
     
+    // Normaliser l'angle entre 0 et 360 degrés
     if (angle < 0) {
         angle += 360.0f;
     }
-    
-    // Décalage des directions (W devient N, NW devient NE, etc.)
-    if (mag_y_value >= -0.66 && mag_y_value <= -0.60 && mag_x_value >= 0 && mag_x_value <= -0.30) {
-        compass_pos = COMPASS_N;
-    } else if (angle >= 22.5f && angle < 67.5f) {
-        compass_pos = COMPASS_NW;      // Était COMPASS_NE
-    } else if (angle >= 67.5f && angle < 112.5f) {
-        compass_pos = COMPASS_N;       // Était COMPASS_E
-    } else if (angle >= 112.5f && angle < 157.5f) {
-        compass_pos = COMPASS_NE;      // Était COMPASS_SE
-    } else if (angle >= 157.5f && angle < 202.5f) {
-        compass_pos = COMPASS_E;       // Était COMPASS_S
-    } else if (angle >= 202.5f && angle < 247.5f) {
-        compass_pos = COMPASS_SE;      // Était COMPASS_SW
-    } else if (angle >= 247.5f && angle < 292.5f) {
-        compass_pos = COMPASS_S;       // Était COMPASS_W
+
+    // Déterminer la direction en fonction de l'angle
+    if ((angle >= 340.5f) || (angle < 10.5f)) {
+        compass_pos = COMPASS_W;
+    } else if ((angle >= 10.5f) && (angle < 67.5f)) {
+        compass_pos = COMPASS_SW;
+    } else if ((angle >= 67.5f) && (angle < 170.5f)) {
+        compass_pos = COMPASS_S;
+    } else if ((angle >= 170.5f) && (angle < 190.5f)) {
+        compass_pos = COMPASS_SE; //
+    } else if ((angle >= 190.5f) && (angle < 220.5f)) {
+        compass_pos = COMPASS_E;
+    } else if ((angle >= 220.5f) && (angle < 240.5f)) {
+        compass_pos = COMPASS_NE; //NE
+    } else if ((angle >= 250.5f) && (angle < 292.5f)) {
+        compass_pos = COMPASS_N;    //NORD
     } else {
-        compass_pos = COMPASS_SW;      // Était COMPASS_NW
+        compass_pos = COMPASS_NW;
     }
 
     lv_obj_t *current_screen = lv_scr_act();

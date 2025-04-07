@@ -78,6 +78,16 @@ extern lv_obj_t * ui_mag_z;
 extern lv_obj_t * ui_compass;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_Screen6
+void ui_Screen6_screen_init(void);
+extern lv_obj_t * ui_Screen6;
+extern lv_obj_t * ui_Clock_Group4;
+extern lv_obj_t * ui_Chronometre;
+extern lv_obj_t * ui_chronometreActi;
+extern lv_obj_t * ui_distance;
+extern lv_obj_t * ui_test;
+// CUSTOM VARIABLES
+
 // EVENTS
 
 void ui_event____initial_actions0(lv_event_t * e);
