@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <zephyr/kernel.h>
 #include "../../inc/timSec.h"
+#include <math.h>
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -390,6 +391,15 @@ void process_queue(void)
             target_label = ui_mag_z;
             format = "Z: %.2f";
             break;
+
+        case MSG_TYPE_STEP_COUNT:
+            // Gérer le comptage de pas ici
+            if (ui_distance != NULL) {
+                char buf[32];
+                snprintf(buf, sizeof(buf), "%d pas", (int)msg.value);
+                lv_label_set_text(ui_distance, buf);
+            }
+            break;
         }
         
         if (target_label != NULL && format != NULL) {
@@ -419,6 +429,7 @@ void ui_init(void)
     ui_Screen3_screen_init();
     ui_Screen4_screen_init();
     ui_Screen5_screen_init();
+    ui_Screen6_screen_init();  // Assurez-vous que cette ligne est présente
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_obj_add_event_cb(ui____initial_actions0, ui_event____initial_actions0, LV_EVENT_ALL, NULL);
 

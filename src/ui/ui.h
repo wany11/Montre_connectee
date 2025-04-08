@@ -87,6 +87,9 @@ extern lv_obj_t * ui_chronometreActi;
 extern lv_obj_t * ui_distance;
 extern lv_obj_t * ui_test;
 // CUSTOM VARIABLES
+extern lv_obj_t *ui_Screen6;
+extern lv_obj_t *ui_Chronometre;
+extern lv_obj_t *ui_test;
 
 // EVENTS
 

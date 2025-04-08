@@ -46,4 +46,8 @@ int lsm6dso_get_step_count(uint32_t *steps);
  */
 int lsm6dso_reset_step_count(void);
 
+// Détection d'activité
+bool lsm6dso_detect_activity(void);
+bool lsm6dso_is_activity_detected(void);
+
 #endif /* LSM6DSO_H */

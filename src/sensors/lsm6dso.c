@@ -58,7 +58,8 @@
          step_detected = true;
          is_step = true;
          step_count++;
-         LSM6DSO_INFO("Step detected! Count: %d, Magnitude: %.2f###################################\n", step_count, acc_magnitude_norm);
+         LSM6DSO_INFO("Step detected! Count: %d, Magnitude: %.2f###################################\n", 
+                      step_count, (double)acc_magnitude_norm);  // Ajout du cast explicite
      } else if (acc_magnitude_norm <= (step_threshold * 0.7f) && acc_magnitude_prev > (step_threshold * 0.7f)) {
          // Falling edge detected - using 70% of the threshold for hysteresis
          step_detected = false;
@@ -175,7 +176,10 @@
  }
  
  static void lsm6dso_handler(const struct device *dev,
-                const struct sensor_trigger *trig)
+                           const struct sensor_trigger *trig) __attribute__((unused));
+                           
+ static void lsm6dso_handler(const struct device *dev,
+                           const struct sensor_trigger *trig)
  {
      LSM6DSO_VERBOSE("Trigger handler called\n");
      lsm6dso_process_sample(dev);
@@ -273,3 +277,40 @@
      LSM6DSO_INFO("Step counter reset to zero\n");
      return 0;
  }
+
+ // Variables pour la détection d'activité
+static float activity_threshold = 10.0f; // Seuil au-dessus de la gravité (1g + marge)
+static bool is_activity_detected = false;
+
+// Fonction pour détecter l'activité à partir des données d'accélération
+bool lsm6dso_detect_activity(void)
+{
+    struct sensor_value accel[3];
+    float norm;
+    
+    // Lire les valeurs d'accélération du capteur
+    if (lsm6dso_dev && device_is_ready(lsm6dso_dev)) {
+        if (sensor_channel_get(lsm6dso_dev, SENSOR_CHAN_ACCEL_XYZ, accel) == 0) {
+            // Calculer la norme de l'accélération
+            float x = sensor_value_to_float(&accel[0]);
+            float y = sensor_value_to_float(&accel[1]);
+            float z = sensor_value_to_float(&accel[2]);
+            
+            norm = sqrtf(x*x + y*y + z*z);
+            // info print norm
+            // LSM6DSO_INFO("Norm: %.2f\n", norm);
+
+            // Comparer à un seuil (1g [gravité] + marge)
+            is_activity_detected = norm > activity_threshold;
+            return is_activity_detected;
+        }
+    }
+    
+    return false;
+}
+
+// Fonction d'API pour obtenir l'état actuel de détection d'activité
+bool lsm6dso_is_activity_detected(void)
+{
+    return is_activity_detected;
+}

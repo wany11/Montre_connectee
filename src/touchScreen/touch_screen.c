@@ -9,10 +9,15 @@
 #include <zephyr/sys/util.h>
 #include "../ui/ui.h"
 #include "../../inc/touch_screen.h"
+#include "../../inc/chronometer.h" // Ajout de l'inclusion du fichier chronometer.h
+#include <lvgl.h>
 
 LOG_MODULE_REGISTER(touch_screen, CONFIG_LOG_DEFAULT_LEVEL);
 
 #define REFRESH_RATE 100
+
+// Définition des délais d'anti-rebond (en ms)
+#define TOUCH_DEBOUNCE_DELAY_MS 400  // Réduit de 300ms à 180ms pour plus de réactivité
 
 static const struct device *const touch_dev = DEVICE_DT_GET(DT_NODELABEL(tsc2007_adafruit_2_8_tft_touch_v2));
  
@@ -24,6 +29,9 @@ static struct {
     bool pressed;
     bool new_data;
 } touch_point;
+
+// Stockage du dernier temps d'interaction pour l'anti-rebond global
+static uint32_t last_touch_time = 0;
  
 static void touch_event_callback(struct input_event *evt, void *user_data)
 {
@@ -55,6 +63,7 @@ int touch_screen_init(void)
  
     k_sem_init(&touch_sem, 0, 1);
     touch_point.new_data = false;
+    last_touch_time = 0;
 
     return 0;
 }
@@ -80,6 +89,31 @@ uint32_t touch_screen_process(void)
         LOG_INF("TOUCH %s X, Y: (%d, %d)", 
                 touch_point.pressed ? "PRESS" : "RELEASE",
                 touch_point.x, touch_point.y);
+    }
+
+    // Vérifiez si nous avons des événements tactiles
+    if (touch_point.pressed) {
+        uint32_t current_time = k_uptime_get_32();
+        
+        // Anti-rebond global - ignorer les appuis trop rapprochés
+        if (current_time - last_touch_time > TOUCH_DEBOUNCE_DELAY_MS) {
+            last_touch_time = current_time;
+            
+            // Vérifiez si nous sommes sur Screen6 et dans la zone du chronomètre
+            if (lv_scr_act() == ui_Screen6 && 
+                touch_point.x >= 67 && touch_point.x <= 170 && 
+                touch_point.y >= 88 && touch_point.y <= 223) {
+                
+                printk("Chronomètre activé à x=%d, y=%d\n", touch_point.x, touch_point.y);
+                chrono_button_handler();
+            }
+            
+            // Ajoutez ici le traitement d'autres zones d'interaction si nécessaire
+            // ...
+        } else {
+            LOG_DBG("Touch ignored (anti-rebond): %d ms since last touch", 
+                    current_time - last_touch_time);
+        }
     }
 
     // Handle LVGL timers and return sleep time

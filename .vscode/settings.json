@@ -9,6 +9,7 @@
         "timsec.h": "c",
         "button.h": "c",
         "rtc.h": "c",
-        "touch_screen.h": "c"
+        "touch_screen.h": "c",
+        "ui.h": "c"
     }
 }

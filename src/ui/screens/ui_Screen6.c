@@ -3,7 +3,166 @@
 // LVGL version: 8.3.11
 // Project name: Proj_test
 
-#include "../ui.h"
+#include "../../ui/ui.h"
+#include <zephyr/kernel.h>
+#include "../../../inc/lsm6dso.h"  // Inclure l'en-tête du capteur LSM6DSO
+
+// Déclaration externe pour la fonction de récupération du nombre de pas
+extern int lsm6dso_get_step_count(uint32_t *steps);
+
+// Déclaration externe pour les fonctions de détection d'activité
+extern bool lsm6dso_detect_activity(void);
+extern bool lsm6dso_is_activity_detected(void);
+
+// États du chronomètre
+typedef enum {
+    CHRONO_STOPPED,
+    CHRONO_RUNNING,
+    CHRONO_PAUSED
+} chrono_state_t;
+
+// Variables pour le chronomètre
+static chrono_state_t chrono_state = CHRONO_STOPPED;
+static int64_t chrono_start_time = 0;
+static int64_t chrono_elapsed_time = 0;
+static lv_timer_t *chrono_timer = NULL;
+static uint32_t step_count = 0;
+
+// Variables pour le chronomètre d'activité
+static int64_t activity_start_time = 0;
+static int64_t activity_elapsed_time = 0;
+static bool activity_was_detected = false;
+
+// Fonction pour mettre à jour l'affichage du chronomètre
+static void update_chrono_display(void)
+{
+    int64_t elapsed;
+    char buf[32];
+    
+    if (chrono_state == CHRONO_RUNNING) {
+        elapsed = chrono_elapsed_time + (k_uptime_get() - chrono_start_time);
+    } else {
+        elapsed = chrono_elapsed_time;
+    }
+    
+    // Convertir en minutes:secondes.centièmes
+    unsigned int min = elapsed / 60000;
+    unsigned int sec = (elapsed % 60000) / 1000;
+    unsigned int ms = (elapsed % 1000) / 10;
+    
+    snprintf(buf, sizeof(buf), "%02u:%02u.%02u", min, sec, ms);
+    lv_label_set_text(ui_Chronometre, buf);
+    
+    // Mise à jour de l'affichage du bouton selon l'état
+    if (chrono_state == CHRONO_STOPPED) {
+        lv_label_set_text(ui_test, "Start");
+    } else if (chrono_state == CHRONO_RUNNING) {
+        lv_label_set_text(ui_test, "Pause");
+    } else if (chrono_state == CHRONO_PAUSED) {
+        lv_label_set_text(ui_test, "Reset");
+    }
+}
+
+// Ajoutez cette fonction après update_chrono_display()
+static void update_step_display(void)
+{
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%u steps", step_count);
+    lv_label_set_text(ui_distance, buf);
+}
+
+// Fonction publique pour mettre à jour le compteur de pas depuis d'autres modules
+void ui_set_step_count(uint32_t steps)
+{
+    step_count = steps;
+    update_step_display();
+}
+
+// Fonction pour mettre à jour l'affichage du chronomètre d'activité
+static void update_activity_chrono_display(void)
+{
+    char buf[32];
+    
+    // Convertir en heures:minutes:secondes
+    unsigned int hours = activity_elapsed_time / 3600000;
+    unsigned int min = (activity_elapsed_time % 3600000) / 60000;
+    unsigned int sec = (activity_elapsed_time % 60000) / 1000;
+    
+    snprintf(buf, sizeof(buf), "%02u:%02u:%02u", hours, min, sec);
+    lv_label_set_text(ui_chronometreActi, buf);
+}
+
+// Fonction de mise à jour périodique du chronomètre
+static void chrono_update_timer_cb(lv_timer_t *timer)
+{
+    if (chrono_state == CHRONO_RUNNING) {
+        update_chrono_display();
+    }
+}
+
+// Fonction de mise à jour périodique du compteur de pas
+static void step_update_timer_cb(lv_timer_t *timer)
+{
+    uint32_t current_steps = 0;
+    if (lsm6dso_get_step_count(&current_steps) == 0) {
+        if (current_steps != step_count) {
+            step_count = current_steps;
+            update_step_display();
+        }
+    }
+}
+
+// Fonction de mise à jour du chronomètre d'activité
+static void activity_timer_cb(lv_timer_t *timer)
+{
+    // Vérifier l'activité actuelle via le capteur LSM6DSO
+    bool current_activity = lsm6dso_detect_activity();
+    
+    if (current_activity) {
+        if (!activity_was_detected) {
+            // L'activité vient de commencer
+            activity_was_detected = true;
+            activity_start_time = k_uptime_get();
+        } else {
+            // L'activité continue, mettre à jour le temps écoulé
+            int64_t now = k_uptime_get();
+            activity_elapsed_time += (now - activity_start_time);
+            activity_start_time = now;
+        }
+    } else {
+        // Pas d'activité
+        activity_was_detected = false;
+    }
+    
+    update_activity_chrono_display();
+}
+
+// Fonction à appeler lorsqu'on appuie sur la zone tactile
+void chrono_button_handler(void)
+{
+    switch (chrono_state) {
+        case CHRONO_STOPPED:
+            // Démarrer le chronomètre
+            chrono_state = CHRONO_RUNNING;
+            chrono_start_time = k_uptime_get();
+            chrono_elapsed_time = 0;
+            break;
+            
+        case CHRONO_RUNNING:
+            // Mettre en pause
+            chrono_state = CHRONO_PAUSED;
+            chrono_elapsed_time += (k_uptime_get() - chrono_start_time);
+            break;
+            
+        case CHRONO_PAUSED:
+            // Réinitialiser
+            chrono_state = CHRONO_STOPPED;
+            chrono_elapsed_time = 0;
+            break;
+    }
+    
+    update_chrono_display();
+}
 
 void ui_Screen6_screen_init(void)
 {
@@ -32,6 +191,8 @@ void ui_Screen6_screen_init(void)
     ui_chronometreActi = lv_label_create(ui_Screen6);
     lv_obj_set_width(ui_chronometreActi, LV_SIZE_CONTENT);   /// 5
     lv_obj_set_height(ui_chronometreActi, LV_SIZE_CONTENT);    /// 100
+    lv_obj_set_x(ui_chronometreActi, 0);
+    lv_obj_set_y(ui_chronometreActi, 50);    
     lv_obj_set_align(ui_chronometreActi, LV_ALIGN_CENTER);
     lv_obj_set_style_text_color(ui_chronometreActi, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_chronometreActi, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -41,7 +202,7 @@ void ui_Screen6_screen_init(void)
     lv_obj_set_width(ui_distance, LV_SIZE_CONTENT);   /// 5
     lv_obj_set_height(ui_distance, LV_SIZE_CONTENT);    /// 100
     lv_obj_set_x(ui_distance, 0);
-    lv_obj_set_y(ui_distance, 50);
+    lv_obj_set_y(ui_distance, 80);
     lv_obj_set_align(ui_distance, LV_ALIGN_CENTER);
     lv_obj_set_style_text_color(ui_distance, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_distance, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -49,10 +210,40 @@ void ui_Screen6_screen_init(void)
     ui_test = lv_label_create(ui_Screen6);
     lv_obj_set_width(ui_test, LV_SIZE_CONTENT);   /// 5
     lv_obj_set_height(ui_test, LV_SIZE_CONTENT);    /// 100
-    lv_obj_set_x(ui_test, -90);
+    lv_obj_set_x(ui_test, -0);
     lv_obj_set_y(ui_test, 0);
     lv_obj_set_align(ui_test, LV_ALIGN_CENTER);
     lv_obj_set_style_text_color(ui_test, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_test, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    // Initialiser l'affichage du chronomètre
+    lv_label_set_text(ui_Chronometre, "00:00.00");
+    lv_label_set_text(ui_test, "Start");
+    
+    // Initialiser l'affichage du nombre de pas
+    uint32_t initial_steps = 0;
+    if (lsm6dso_get_step_count(&initial_steps) == 0) {
+        step_count = initial_steps;
+    }
+    update_step_display();
+
+    // Initialiser l'affichage du chronomètre d'activité
+    lv_label_set_text(ui_chronometreActi, "00:00:00");
+    
+    // Créer un timer pour mettre à jour l'affichage du chronomètre (10 fois par seconde)
+    if (chrono_timer == NULL) {
+        chrono_timer = lv_timer_create(chrono_update_timer_cb, 100, NULL);
+    }
+
+    // Créer un timer pour mettre à jour l'affichage du compteur de pas (chaque seconde)
+    static lv_timer_t *step_timer = NULL;
+    if (step_timer == NULL) {
+        step_timer = lv_timer_create(step_update_timer_cb, 1000, NULL);
+    }
+
+    // Créer un timer pour mettre à jour le chronomètre d'activité
+    static lv_timer_t *activity_timer = NULL;
+    if (activity_timer == NULL) {
+        activity_timer = lv_timer_create(activity_timer_cb, 250, NULL); // 4 fois par seconde
+    }
 }

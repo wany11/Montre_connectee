@@ -29,4 +29,11 @@ int touch_screen_get_point(size_t *x, size_t *y, bool *pressed);
  */
 uint32_t touch_screen_process(void);
 
+/**
+ * @brief Set the step count in the UI
+ * 
+ * @param steps Number of steps to set
+ */
+void ui_set_step_count(uint32_t steps);
+
 #endif /* TOUCH_SCREEN_H */
