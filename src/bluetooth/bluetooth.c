@@ -88,13 +88,15 @@ static void format_sensor_data(void)
         "\"humidity\":%.2f,"
         "\"accel\":{\"x\":%.2f,\"y\":%.2f,\"z\":%.2f},"
         "\"gyro\":{\"x\":%.2f,\"y\":%.2f,\"z\":%.2f},"
-        "\"mag\":{\"x\":%.2f,\"y\":%.2f,\"z\":%.2f}"
+        "\"mag\":{\"x\":%.2f,\"y\":%.2f,\"z\":%.2f},"
+        "\"step_count\":%.0f"
         "}",
         g_sensor_data.temperature,
         g_sensor_data.humidity,
         g_sensor_data.accel_x, g_sensor_data.accel_y, g_sensor_data.accel_z,
         g_sensor_data.gyro_x, g_sensor_data.gyro_y, g_sensor_data.gyro_z,
-        g_sensor_data.mag_x, g_sensor_data.mag_y, g_sensor_data.mag_z
+        g_sensor_data.mag_x, g_sensor_data.mag_y, g_sensor_data.mag_z,
+        g_sensor_data.step_count
     );
 }
 
