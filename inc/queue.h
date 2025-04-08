@@ -16,6 +16,7 @@ typedef enum {
     MSG_TYPE_MAG_X,
     MSG_TYPE_MAG_Y,
     MSG_TYPE_MAG_Z,
+    MSG_TYPE_STEP_COUNT,  // Step counter message type
 } sensor_msg_type_t;
 
 /* Message structure to hold both value and type */

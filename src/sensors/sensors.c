@@ -128,6 +128,12 @@ void store_sensor_reading(sensor_msg_type_t type, double value)
         SENSORS_VERBOSE("Storing magnetometer reading (axis %d): %.2f\n", 
                       type - MSG_TYPE_MAG_X, value);
         break;
+
+    case MSG_TYPE_STEP_COUNT:
+        /* Store the latest step count */
+        g_sensor_data.step_count = value;
+        SENSORS_VERBOSE("Storing step count: %.0f steps\n", value);
+        break;
         
     default:
         /* Unknown sensor type */

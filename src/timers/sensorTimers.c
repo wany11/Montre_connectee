@@ -65,7 +65,7 @@ void start_sensor_timers(void)
     SENSORS_INFO("LIS2MDL timer started with 5-second intervals\n");
     
     /* Start LSM6DSO timer with 1-second intervals */
-    k_timer_start(&lsm6dso_timer, K_SECONDS(3), K_SECONDS(1));
+    k_timer_start(&lsm6dso_timer, K_SECONDS(3), K_MSEC(250));
     SENSORS_INFO("LSM6DSO timer started with 1-second intervals\n");
 }
 

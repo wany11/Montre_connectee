@@ -18,6 +18,7 @@ typedef struct {
     double mag_x;        /* Magnetometer X-axis reading */
     double mag_y;        /* Magnetometer Y-axis reading */
     double mag_z;        /* Magnetometer Z-axis reading */
+    double step_count;   /* Step counter reading */
 } sensor_data_t;
 
 /**

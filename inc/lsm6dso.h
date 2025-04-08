@@ -10,6 +10,7 @@
 #define LSM6DSO_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 /**
  * @brief Initialize the LSM6DSO accelerometer and gyroscope
@@ -29,5 +30,20 @@ bool my_lsm6dso_init(void);
  * available, it will use simulated values.
  */
 void lsm6dso_sample(void);
+
+/**
+ * @brief Fetch current step count
+ * 
+ * @param steps Pointer to store step count value
+ * @return int 0 on success, negative error code otherwise
+ */
+int lsm6dso_get_step_count(uint32_t *steps);
+
+/**
+ * @brief Reset step counter to zero
+ * 
+ * @return int 0 on success, negative error code otherwise
+ */
+int lsm6dso_reset_step_count(void);
 
 #endif /* LSM6DSO_H */
