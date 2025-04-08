@@ -40,4 +40,19 @@ int rtc_set_datetime(uint16_t year, uint8_t month, uint8_t day,
 int rtc_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day,
                      uint8_t *hour, uint8_t *minute, uint8_t *second);
 
+/* Variables globales pour stocker l'heure actuelle */
+extern uint16_t g_current_year;
+extern uint8_t g_current_month;
+extern uint8_t g_current_day;
+extern uint8_t g_current_hour;
+extern uint8_t g_current_minute;
+extern uint8_t g_current_second;
+
+/* Fonction pour mettre à jour les variables globales */
+int rtc_update_global_time(void);
+
+/* Alias pour rtc_get_datetime pour corriger l'erreur de compilation */
+int rtc_get_datetimes(uint16_t *year, uint8_t *month, uint8_t *day,
+                      uint8_t *hour, uint8_t *minute, uint8_t *second);
+
 #endif /* RTC_H_ */

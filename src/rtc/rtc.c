@@ -24,6 +24,28 @@ static const struct device *i2c_dev;
 #define RV8263_REG_STATUS     0x11
 #define RV8263_REG_CONTROL3   0x12
 
+/* Définition des variables globales */
+uint16_t g_current_year = 2023;
+uint8_t g_current_month = 1;
+uint8_t g_current_day = 1;
+uint8_t g_current_hour = 0;
+uint8_t g_current_minute = 0;
+uint8_t g_current_second = 0;
+
+/* Met à jour les variables globales en appelant rtc_get_datetime */
+int rtc_update_global_time(void)
+{
+    return rtc_get_datetime(&g_current_year, &g_current_month, &g_current_day, 
+                           &g_current_hour, &g_current_minute, &g_current_second);
+}
+
+/* Fonction alias pour résoudre l'erreur de build */
+int rtc_get_datetimes(uint16_t *year, uint8_t *month, uint8_t *day,
+                      uint8_t *hour, uint8_t *minute, uint8_t *second)
+{
+    return rtc_get_datetime(year, month, day, hour, minute, second);
+}
+
 int rtc_init(void)
 {
     /* Récupérer l'appareil RTC via le nœud DT */
@@ -161,7 +183,17 @@ int rtc_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day,
     // Année 20xx
     *year = 2000 + bcd2bin(data);
 
+    // Mettre à jour les variables globales en même temps
+    g_current_year = *year;
+    g_current_month = *month;
+    g_current_day = *day;
+    g_current_hour = *hour;
+    g_current_minute = *minute;
+    g_current_second = *second;
+
     RTC_INFO("Heure actuelle: %04d-%02d-%02d %02d:%02d:%02d\n",
             *year, *month, *day, *hour, *minute, *second);
     return 0;
 }
+
+

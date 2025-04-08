@@ -4,6 +4,7 @@
 // Project name: Proj_test
 
 #include "../ui.h"
+#include "../../../inc/rtc.h"
 
 void ui_Screen2_screen_init(void)
 {
@@ -243,29 +244,21 @@ void ui_Screen2_screen_init(void)
 // Fonction de mise à jour de l'horloge analogique
 void ui_update_analog_clock(void)
 {
-    // Variables pour stocker l'heure actuelle
-    uint16_t year;
-    uint8_t month, day, hour, minute, second;
+    // Utiliser directement les variables globales au lieu d'appeler rtc_get_datetime
     
-    // Récupérer l'heure actuelle depuis le RTC
-    if (rtc_get_datetime(&year, &month, &day, &hour, &minute, &second) == 0) {
-        // Calculer les angles pour chaque aiguille
-        // L'angle zéro est à 12h, rotation horaire
-        
-        // Secondes: 360 degrés / 60 secondes = 6 degrés par seconde
-        int32_t sec_angle = second * 6;
-        
-        // Minutes: 360 degrés / 60 minutes = 6 degrés par minute
-        // + secondes/60 pour mouvement fluide
-        int32_t min_angle = minute * 6 + (second / 10);
-        
-        // Heures: 360 degrés / 12 heures = 30 degrés par heure
-        // + minutes/60 pour mouvement fluide
-        int32_t hour_angle = (hour % 12) * 30 + (minute / 2);
-        
-        // Mettre à jour les rotations des aiguilles
-        lv_img_set_angle(ui_sec, sec_angle * 10);  // LVGL utilise unités de 0.1 degré
-        lv_img_set_angle(ui_min, min_angle * 10);
-        lv_img_set_angle(ui_hour, hour_angle * 10);
-    }
+    // Secondes: 360 degrés / 60 secondes = 6 degrés par seconde
+    int32_t sec_angle = g_current_second * 6;
+    
+    // Minutes: 360 degrés / 60 minutes = 6 degrés par minute
+    // + secondes/60 pour mouvement fluide
+    int32_t min_angle = g_current_minute * 6 + (g_current_second / 10);
+    
+    // Heures: 360 degrés / 12 heures = 30 degrés par heure
+    // + minutes/60 pour mouvement fluide
+    int32_t hour_angle = (g_current_hour % 12) * 30 + (g_current_minute / 2);
+    
+    // Mettre à jour les rotations des aiguilles
+    lv_img_set_angle(ui_sec, sec_angle * 10);  // LVGL utilise unités de 0.1 degré
+    lv_img_set_angle(ui_min, min_angle * 10);
+    lv_img_set_angle(ui_hour, hour_angle * 10);
 }
