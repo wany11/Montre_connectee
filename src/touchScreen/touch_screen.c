@@ -107,8 +107,8 @@ uint32_t touch_screen_process(void)
                 printk("Chronomètre activé à x=%d, y=%d\n", touch_point.x, touch_point.y);
                 chrono_button_handler();
             }
-            
-            else if (touch_point.y < 50) {
+
+            else if (touch_point.y > 250) {
                 if (lv_scr_act() == ui_Screen2 || lv_scr_act() == NULL) {
                     _ui_screen_change(&ui_Screen7, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen7_screen_init);
                 } else if (lv_scr_act() == ui_Screen3) {
@@ -123,7 +123,7 @@ uint32_t touch_screen_process(void)
                     _ui_screen_change(&ui_Screen6, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen6_screen_init);
                 }
             }
-            else if (touch_point.y > 250) {
+            else if (touch_point.y < 50) {
                 if (lv_scr_act() == ui_Screen2 || lv_scr_act() == NULL) {
                     _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen3_screen_init);
                 } else if (lv_scr_act() == ui_Screen3) {
