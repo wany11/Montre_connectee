@@ -86,6 +86,20 @@ lv_obj_t * ui_distance;
 lv_obj_t * ui_test;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_Screen7
+void ui_Screen7_screen_init(void);
+lv_obj_t * ui_Screen7;
+lv_obj_t * ui_Clock_Group5;
+lv_obj_t * ui_month;
+lv_obj_t * ui_lundi;
+lv_obj_t * ui_mardi;
+lv_obj_t * ui_mercredi;
+lv_obj_t * ui_jeudi;
+lv_obj_t * ui_vendredi;
+lv_obj_t * ui_samedi;
+lv_obj_t * ui_dimanche;
+// CUSTOM VARIABLES
+
 // EVENTS
 void ui_event____initial_actions0(lv_event_t * e);
 lv_obj_t * ui____initial_actions0;
@@ -432,7 +446,8 @@ void ui_init(void)
     ui_Screen3_screen_init();
     ui_Screen4_screen_init();
     ui_Screen5_screen_init();
-    ui_Screen6_screen_init();  // Assurez-vous que cette ligne est présente
+    ui_Screen6_screen_init();
+    ui_Screen7_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_obj_add_event_cb(ui____initial_actions0, ui_event____initial_actions0, LV_EVENT_ALL, NULL);
 

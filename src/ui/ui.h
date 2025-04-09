@@ -93,6 +93,20 @@ extern lv_obj_t *ui_Screen6;
 extern lv_obj_t *ui_Chronometre;
 extern lv_obj_t *ui_test;
 
+// SCREEN: ui_Screen7
+void ui_Screen7_screen_init(void);
+extern lv_obj_t * ui_Screen7;
+extern lv_obj_t * ui_Clock_Group5;
+extern lv_obj_t * ui_month;
+extern lv_obj_t * ui_lundi;
+extern lv_obj_t * ui_mardi;
+extern lv_obj_t * ui_mercredi;
+extern lv_obj_t * ui_jeudi;
+extern lv_obj_t * ui_vendredi;
+extern lv_obj_t * ui_samedi;
+extern lv_obj_t * ui_dimanche;
+// CUSTOM VARIABLES
+
 // EVENTS
 
 void ui_event____initial_actions0(lv_event_t * e);
