@@ -43,10 +43,12 @@ lv_obj_t * ui_Clock_Group2;
 lv_obj_t * ui_HourLabel;
 lv_obj_t * ui_LabelHumi;
 lv_obj_t * ui_LabelTemp;
+lv_obj_t * ui_nbPas;
 lv_obj_t * ui_Image1;
 lv_obj_t * ui_Image2;
 lv_obj_t * ui_Image3;
 lv_obj_t * ui_Image4;
+lv_obj_t * ui_Image5;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_Screen4
@@ -393,12 +395,13 @@ void process_queue(void)
             break;
 
         case MSG_TYPE_STEP_COUNT:
-            // Gérer le comptage de pas ici
-            if (ui_distance != NULL) {
-                char buf[32];
-                snprintf(buf, sizeof(buf), "%d pas", (int)msg.value);
-                lv_label_set_text(ui_distance, buf);
+            if (ui_nbPas != NULL) {
+                lv_snprintf(buffer, sizeof(buffer), "%d", (int)msg.value);
+                lv_label_set_text(ui_nbPas, buffer);
             }
+            // Ne pas utiliser target_label car on gère directement les deux labels
+            target_label = NULL;
+            format = NULL;
             break;
         }
         
@@ -445,17 +448,23 @@ void ui_thread_entry(void *p1, void *p2, void *p3)
     
     /* Initialize default labels if necessary */
     if (ui_LabelTemp != NULL) {
-        lv_label_set_text(ui_LabelTemp, "Temperature: --.- °C");
+        lv_label_set_text(ui_LabelTemp, " Temp\n--.- °C");  // Format identique à MSG_TYPE_TEMPERATURE
     }
     
     if (ui_LabelHumi != NULL) {
-        lv_label_set_text(ui_LabelHumi, "Humidity: --.-%");
+        lv_label_set_text(ui_LabelHumi, " Hum\n--.-%");    // Format identique à MSG_TYPE_HUMIDITY
     }
     
     if (ui_HourLabel != NULL) {
         lv_label_set_text(ui_HourLabel, "00:00:00");
     }
-
+    
+    if (ui_distance != NULL) {
+        lv_label_set_text(ui_distance, "0 steps");
+    }
+    if (ui_nbPas != NULL) {
+        lv_label_set_text(ui_nbPas, "0");
+    }
     uint32_t last_sensor_update = 0;
     uint32_t last_time_update = 0;
 

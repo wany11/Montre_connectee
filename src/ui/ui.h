@@ -47,10 +47,12 @@ extern lv_obj_t * ui_Clock_Group2;
 extern lv_obj_t * ui_HourLabel;
 extern lv_obj_t * ui_LabelHumi;
 extern lv_obj_t * ui_LabelTemp;
+extern lv_obj_t * ui_nbPas;
 extern lv_obj_t * ui_Image1;
 extern lv_obj_t * ui_Image2;
 extern lv_obj_t * ui_Image3;
 extern lv_obj_t * ui_Image4;
+extern lv_obj_t * ui_Image5;
 // CUSTOM VARIABLES
 
 // SCREEN: ui_Screen4
@@ -105,6 +107,7 @@ LV_IMG_DECLARE(ui_img_weather_sun_cloud_png);    // assets/weather_sun_cloud.png
 LV_IMG_DECLARE(ui_img_weather_sun_png);    // assets/weather_sun.png
 LV_IMG_DECLARE(ui_img_weather_cloud_fog_png);    // assets/weather_cloud_fog.png
 LV_IMG_DECLARE(ui_img_weather_cloud_png);    // assets/weather_cloud.png
+LV_IMG_DECLARE(ui_img_step_png);    // assets/step.png
 
 // UI INIT
 void ui_init(void);
