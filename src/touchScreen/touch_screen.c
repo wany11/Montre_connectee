@@ -108,8 +108,36 @@ uint32_t touch_screen_process(void)
                 chrono_button_handler();
             }
             
-            // Ajoutez ici le traitement d'autres zones d'interaction si nécessaire
-            // ...
+            else if (touch_point.y < 50) {
+                if (lv_scr_act() == ui_Screen2 || lv_scr_act() == NULL) {
+                    _ui_screen_change(&ui_Screen7, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen7_screen_init);
+                } else if (lv_scr_act() == ui_Screen3) {
+                    _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
+                } else if (lv_scr_act() == ui_Screen4) {
+                    _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen3_screen_init);
+                } else if (lv_scr_act() == ui_Screen5) {
+                    _ui_screen_change(&ui_Screen4, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen4_screen_init);
+                } else if (lv_scr_act() == ui_Screen6) {
+                    _ui_screen_change(&ui_Screen5, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen5_screen_init);
+                } else if (lv_scr_act() == ui_Screen7) {
+                    _ui_screen_change(&ui_Screen6, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen6_screen_init);
+                }
+            }
+            else if (touch_point.y > 250) {
+                if (lv_scr_act() == ui_Screen2 || lv_scr_act() == NULL) {
+                    _ui_screen_change(&ui_Screen3, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen3_screen_init);
+                } else if (lv_scr_act() == ui_Screen3) {
+                    _ui_screen_change(&ui_Screen4, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen4_screen_init);
+                } else if (lv_scr_act() == ui_Screen4) {
+                    _ui_screen_change(&ui_Screen5, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen5_screen_init);
+                } else if (lv_scr_act() == ui_Screen5) {
+                    _ui_screen_change(&ui_Screen6, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen6_screen_init);
+                } else if (lv_scr_act() == ui_Screen6) {
+                    _ui_screen_change(&ui_Screen7, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen7_screen_init);
+                } else if (lv_scr_act() == ui_Screen7) {
+                    _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
+                }
+            }
         } else {
             LOG_DBG("Touch ignored (anti-rebond): %d ms since last touch", 
                     current_time - last_touch_time);
