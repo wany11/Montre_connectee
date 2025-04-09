@@ -91,6 +91,7 @@ void ui_Screen7_screen_init(void);
 lv_obj_t * ui_Screen7;
 lv_obj_t * ui_Clock_Group5;
 lv_obj_t * ui_month;
+lv_obj_t * ui_year;
 lv_obj_t * ui_lundi;
 lv_obj_t * ui_mardi;
 lv_obj_t * ui_mercredi;

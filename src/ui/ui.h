@@ -98,6 +98,7 @@ void ui_Screen7_screen_init(void);
 extern lv_obj_t * ui_Screen7;
 extern lv_obj_t * ui_Clock_Group5;
 extern lv_obj_t * ui_month;
+extern lv_obj_t *ui_year;
 extern lv_obj_t * ui_lundi;
 extern lv_obj_t * ui_mardi;
 extern lv_obj_t * ui_mercredi;
@@ -105,7 +106,6 @@ extern lv_obj_t * ui_jeudi;
 extern lv_obj_t * ui_vendredi;
 extern lv_obj_t * ui_samedi;
 extern lv_obj_t * ui_dimanche;
-// CUSTOM VARIABLES
 
 // EVENTS
 

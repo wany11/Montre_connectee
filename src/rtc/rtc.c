@@ -25,9 +25,9 @@ static const struct device *i2c_dev;
 #define RV8263_REG_CONTROL3   0x12
 
 /* Définition des variables globales */
-uint16_t g_current_year = 2023;
+uint16_t g_current_year = 2000;
 uint8_t g_current_month = 1;
-uint8_t g_current_day = 1;
+uint8_t g_current_day = 11;
 uint8_t g_current_hour = 0;
 uint8_t g_current_minute = 0;
 uint8_t g_current_second = 0;
