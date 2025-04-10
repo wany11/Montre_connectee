@@ -110,7 +110,7 @@ uint32_t touch_screen_process(void)
 
             else if (touch_point.y > 250) {
                 if (lv_scr_act() == ui_Screen2 || lv_scr_act() == NULL) {
-                    _ui_screen_change(&ui_Screen7, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen7_screen_init);
+                    _ui_screen_change(&ui_Screen8, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen8_screen_init);
                 } else if (lv_scr_act() == ui_Screen3) {
                     _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
                 } else if (lv_scr_act() == ui_Screen4) {
@@ -121,6 +121,8 @@ uint32_t touch_screen_process(void)
                     _ui_screen_change(&ui_Screen5, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen5_screen_init);
                 } else if (lv_scr_act() == ui_Screen7) {
                     _ui_screen_change(&ui_Screen6, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen6_screen_init);
+                } else if (lv_scr_act() == ui_Screen8) {
+                    _ui_screen_change(&ui_Screen7, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen7_screen_init);
                 }
             }
             else if (touch_point.y < 50) {
@@ -135,6 +137,8 @@ uint32_t touch_screen_process(void)
                 } else if (lv_scr_act() == ui_Screen6) {
                     _ui_screen_change(&ui_Screen7, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen7_screen_init);
                 } else if (lv_scr_act() == ui_Screen7) {
+                    _ui_screen_change(&ui_Screen8, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen8_screen_init);
+                }else if (lv_scr_act() == ui_Screen8) {
                     _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
                 }
             }

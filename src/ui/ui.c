@@ -101,6 +101,11 @@ lv_obj_t * ui_samedi;
 lv_obj_t * ui_dimanche;
 // CUSTOM VARIABLES
 
+// SCREEN: ui_Screen8
+void ui_Screen8_screen_init(void);
+lv_obj_t * ui_Screen8;
+// CUSTOM VARIABLES
+
 // EVENTS
 void ui_event____initial_actions0(lv_event_t * e);
 lv_obj_t * ui____initial_actions0;
@@ -486,27 +491,27 @@ void ui_thread_entry(void *p1, void *p2, void *p3)
 
     while (1) {
         lv_obj_t *current_screen = lv_scr_act();
-        uint32_t current_time = k_uptime_get_32();
+        uint32_t up_time = k_uptime_get_32();
         
         // Mise à jour des capteurs toutes les 100ms
-        if (current_time - last_sensor_update >= 100) {
+        if (up_time - last_sensor_update >= 100) {
             if (current_screen == ui_Screen3 ||
                 current_screen == ui_Screen4 ||
                 current_screen == ui_Screen5) {
                 process_queue();
             }
-            last_sensor_update = current_time;
+            last_sensor_update = up_time;
         }
         
         // Mise à jour de l'heure chaque seconde (uniquement pour Screen3)
         if (current_screen == ui_Screen3) {
-            if (current_time - last_time_update >= 1000) {
-                if (ui_HourLabel != NULL) {
-                    char time_str[32];
-                    format_time(get_temps(), time_str, sizeof(time_str));
-                    lv_label_set_text(ui_HourLabel, time_str);
-                }
-                last_time_update = current_time;
+            if (up_time - last_time_update >= 1000) {
+                last_time_update = up_time;
+            }
+            if (ui_HourLabel != NULL) {
+                char time_str[32];
+                format_time(get_temps(), time_str, sizeof(time_str));
+                lv_label_set_text(ui_HourLabel, time_str);
             }
         }
 

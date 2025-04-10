@@ -107,6 +107,11 @@ extern lv_obj_t * ui_vendredi;
 extern lv_obj_t * ui_samedi;
 extern lv_obj_t * ui_dimanche;
 
+// SCREEN: ui_Screen8
+void ui_Screen8_screen_init(void);
+extern lv_obj_t * ui_Screen8;
+// CUSTOM VARIABLES
+
 // EVENTS
 
 void ui_event____initial_actions0(lv_event_t * e);

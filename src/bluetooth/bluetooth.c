@@ -52,18 +52,18 @@ static struct bt_uuid_128 sensor_char_uuid = BT_UUID_INIT_128(SENSOR_CHAR_UUID_V
 static void connected(struct bt_conn *conn, uint8_t err)
 {
     if (err) {
-        printk("Connection failed, err 0x%02x %s\n", err, bt_hci_err_to_str(err));
+        BT_ERROR("Connection failed, err 0x%02x %s\n", err, bt_hci_err_to_str(err));
         return;
     }
 
     current_conn = bt_conn_ref(conn);
     connected_flag = true;
-    printk("Connected\n");
+    BT_INFO("Connected\n");
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
-    printk("Disconnected, reason 0x%02x %s\n", reason, bt_hci_err_to_str(reason));
+    BT_INFO("Disconnected, reason 0x%02x %s\n", reason, bt_hci_err_to_str(reason));
 
     if (current_conn) {
         bt_conn_unref(current_conn);
@@ -112,7 +112,7 @@ static void sensor_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t val
 {
     ARG_UNUSED(attr);
     notif_enabled = (value == BT_GATT_CCC_NOTIFY);
-    printk("Notifications %s\n", notif_enabled ? "enabled" : "disabled");
+    BT_INFO("Notifications %s\n", notif_enabled ? "enabled" : "disabled");
 }
 
 /* Define the custom sensor service */
@@ -135,30 +135,30 @@ void bluetooth_run(void)
 {
     int err;
 
-    printk("Starting Custom Sensor Service\n");
+    BT_INFO("Starting Custom Sensor Service\n");
 
     err = bt_enable(NULL);
     if (err) {
-        printk("Bluetooth init failed (err %d)\n", err);
+        BT_ERROR("Bluetooth init failed (err %d)\n", err);
         return;
     }
 
-    printk("Bluetooth initialized\n");
+    BT_INFO("Bluetooth initialized\n");
 
     if (IS_ENABLED(CONFIG_SETTINGS)) {
         settings_load();
     }
     
-    printk("Custom Sensor service initialized\n");
+    BT_INFO("Custom Sensor service initialized\n");
 
     /* Start advertising */
     err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), NULL, 0);
     if (err) {
-        printk("Advertising failed to start (err %d)\n", err);
+        BT_ERROR("Advertising failed to start (err %d)\n", err);
         return;
     }
 
-    printk("Advertising successfully started\n");
+    BT_INFO("Advertising successfully started\n");
 
     /* Main loop - periodically send sensor data */
     while (1) {
@@ -168,13 +168,13 @@ void bluetooth_run(void)
             
             size_t data_len = strlen(sensor_data_buffer);
             if (data_len > 0) {
-                printk("Sending sensor data: %s\n", sensor_data_buffer);
+                BT_VERBOSE("Sending sensor data: %s\n", sensor_data_buffer);
                 
                 /* Send data via custom service notification */
                 err = bt_gatt_notify(NULL, &sensor_svc.attrs[1], 
                                     sensor_data_buffer, data_len);
                 if (err) {
-                    printk("Failed to send notification (err %d)\n", err);
+                    BT_ERROR("Failed to send notification (err %d)\n", err);
                 }
             }
         }

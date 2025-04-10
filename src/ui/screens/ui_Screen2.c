@@ -5,6 +5,7 @@
 
 #include "../ui.h"
 #include "../../../inc/rtc.h"
+#include "../../../inc/timSec.h"
 
 void ui_Screen2_screen_init(void)
 {
@@ -244,21 +245,35 @@ void ui_Screen2_screen_init(void)
 // Fonction de mise à jour de l'horloge analogique
 void ui_update_analog_clock(void)
 {
-    // Utiliser directement les variables globales au lieu d'appeler rtc_get_datetime
+    uint32_t seconds;
+    uint8_t hour, minute, second;
+    
+    // Utiliser le temps du fake_timer si le RTC n'est pas disponible
+    seconds = get_temps(); // Cette fonction renvoie fake_time si le RTC n'est pas connecté
+    
+    // Convertir les secondes en heures/minutes/secondes
+    hour = (seconds / 3600) % 24;
+    minute = (seconds / 60) % 60;
+    second = seconds % 60;
     
     // Secondes: 360 degrés / 60 secondes = 6 degrés par seconde
-    int32_t sec_angle = g_current_second * 6;
+    int32_t sec_angle = second * 6;
     
     // Minutes: 360 degrés / 60 minutes = 6 degrés par minute
     // + secondes/60 pour mouvement fluide
-    int32_t min_angle = g_current_minute * 6 + (g_current_second / 10);
+    int32_t min_angle = minute * 6 + (second / 10);
     
     // Heures: 360 degrés / 12 heures = 30 degrés par heure
     // + minutes/60 pour mouvement fluide
-    int32_t hour_angle = (g_current_hour % 12) * 30 + (g_current_minute / 2);
+    int32_t hour_angle = (hour % 12) * 30 + (minute / 2);
     
     // Mettre à jour les rotations des aiguilles
     lv_img_set_angle(ui_sec, sec_angle * 10);  // LVGL utilise unités de 0.1 degré
     lv_img_set_angle(ui_min, min_angle * 10);
     lv_img_set_angle(ui_hour, hour_angle * 10);
+    
+    // Mettre à jour les variables globales pour d'autres écrans
+    g_current_hour = hour;
+    g_current_minute = minute;
+    g_current_second = second;
 }

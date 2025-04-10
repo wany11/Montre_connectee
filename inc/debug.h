@@ -64,4 +64,8 @@
 #define RTC_INFO(fmt, ...)    DEBUG_INFO_PRINT("RTC", fmt, ##__VA_ARGS__)
 #define RTC_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("RTC", fmt, ##__VA_ARGS__)
 
+#define BT_ERROR(fmt, ...)   DEBUG_ERROR_PRINT("BT", fmt, ##__VA_ARGS__)
+#define BT_INFO(fmt, ...)    DEBUG_INFO_PRINT("BT", fmt, ##__VA_ARGS__)
+#define BT_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("BT", fmt, ##__VA_ARGS__)
+
 #endif /* DEBUG_H_ */

@@ -45,7 +45,7 @@ uint32_t get_temps(void)
         // Obtenir l'heure actuelle depuis le RTC
         int ret = rtc_get_datetime(&year, &month, &day, &hour, &minute, &second);
         if (ret < 0) {
-            DEBUG_ERROR_PRINT("TIMER", "Erreur lors de la lecture RTC: %d\n", ret);
+            DEBUG_ERROR_PRINT("TIMER", "Erreur lors de la lecture RTC set de l'heure système: %d\n", ret);
             return fake_time;  // Utiliser le temps de secours en cas d'erreur
         }
         
@@ -67,12 +67,11 @@ void format_time(uint32_t seconds, char *buffer, size_t buffer_size)
 }
 
 /* Function to set the current time */
-int set_time(uint8_t hour, uint8_t minute, uint8_t second)
+int set_time(uint8_t hour, uint8_t minute, uint8_t second,  uint16_t year, uint8_t month, uint8_t day)
 {
     if (rtc_available) {
         // Obtenir d'abord la date actuelle pour ne pas la modifier
-        uint16_t year;
-        uint8_t month, day, old_hour, old_minute, old_second;
+        uint8_t old_hour, old_minute, old_second;
         
         int ret = rtc_get_datetime(&year, &month, &day, &old_hour, &old_minute, &old_second);
         if (ret < 0) {
@@ -84,6 +83,9 @@ int set_time(uint8_t hour, uint8_t minute, uint8_t second)
         return rtc_set_datetime(year, month, day, hour, minute, second);
     } else {
         // Définir l'heure sur le compteur de secours
+        g_current_day = day;
+        g_current_month = month;
+        g_current_year = year;
         fake_time = hour * 3600 + minute * 60 + second;
         DEBUG_INFO_PRINT("TIMER", "Heure définie sur le compteur de secours: %02d:%02d:%02d\n", 
                          hour, minute, second);
