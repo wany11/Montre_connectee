@@ -137,7 +137,7 @@ static bool ble_running = true;
 static struct k_sem ble_sem;
 
 /* Timeout values in milliseconds */
-#define BLE_CONNECTION_TIMEOUT_MS (5 * 1000)  // 60 seconds timeout if no connection
+#define BLE_CONNECTION_TIMEOUT_MS (30 * 1000)  // 60 seconds timeout if no connection
 
 /* Check if BLE is currently active */
 bool is_ble_active(void)

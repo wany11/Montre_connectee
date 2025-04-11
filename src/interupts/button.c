@@ -16,6 +16,13 @@
 #define BUTTON_DEBOUNCE_DELAY_MS 50
 #define BUTTON_MIN_INTERVAL_MS 200  // Temps minimum entre deux pressions
 
+/* Define the backlight control pin - PI.05 on nRF5340DK */
+static const struct gpio_dt_spec backlight_pin = {
+    .port = DEVICE_DT_GET(DT_NODELABEL(gpio1)),
+    .pin = 5,
+    .dt_flags = GPIO_ACTIVE_HIGH
+};
+
 /* Button GPIO device */
 static const struct gpio_dt_spec button1 = GPIO_DT_SPEC_GET(BUTTON1_NODE, gpios);
 static const struct gpio_dt_spec button2 = GPIO_DT_SPEC_GET(BUTTON2_NODE, gpios);
@@ -45,12 +52,39 @@ static void button_pressed_work_handler(struct k_work *work)
     
     if (display_on) {
         BUTTON_INFO("Turning display ON\n");
-        display_set_brightness(display_dev, 255);
-        display_blanking_off(display_dev);
+        /* Turn on backlight by setting pin HIGH */
+        int ret = gpio_pin_set_dt(&backlight_pin, 1);
+        BUTTON_INFO("Backlight pin set result: %d\n", ret);
+        
+        /* Then enable display through display API */
+        ret = display_set_brightness(display_dev, 255);
+        BUTTON_INFO("Set brightness result: %d\n", ret);
+        
+        ret = display_blanking_off(display_dev);
+        BUTTON_INFO("Display blanking off result: %d\n", ret);
+        
+        /* Restore previous screen if available */
+        if (current_active_screen) {
+            lv_scr_load(current_active_screen);
+        }
     } else {
         BUTTON_INFO("Turning display OFF\n");
-        display_set_brightness(display_dev, 1);
-        display_blanking_on(display_dev);
+        /* Save current screen before turning off */
+        current_active_screen = lv_scr_act();
+        
+        /* First blank the display through display API */
+        int ret = display_set_brightness(display_dev, 0);
+        BUTTON_INFO("Set brightness to 0 result: %d\n", ret);
+        
+        ret = display_blanking_on(display_dev);
+        BUTTON_INFO("Display blanking on result: %d\n", ret);
+        
+        /* Actually cut power to backlight by setting pin LOW */
+        ret = gpio_pin_set_dt(&backlight_pin, 0);
+        BUTTON_INFO("Backlight pin clear result: %d\n", ret);
+        
+        /* Force a small delay to ensure the commands execute */
+        k_sleep(K_MSEC(50)); // Increased delay
     }
 }
 
@@ -84,12 +118,13 @@ static void button2_pressed_cb(const struct device *dev, struct gpio_callback *c
 
     BUTTON_INFO("Button 2 pressed at %u ms\n", current_time);
     
-    /* Go to home screen */
-    current_active_screen = ui_Screen2;
-    _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen2_screen_init);
+    /* Store current screen before turning off */
+    if (display_on) {
+        current_active_screen = lv_scr_act();
+    }
     
-    /* Toggle display if pressed again within short time */
-    k_work_schedule(&button_work, K_MSEC(BUTTON_DEBOUNCE_DELAY_MS));
+    /* Toggle display immediately without going to home screen first */
+    k_work_schedule(&button_work, K_NO_WAIT);
 }
 
 /* Initialize button */
@@ -105,6 +140,18 @@ int button_init(const struct device *disp_dev)
         return -ENODEV;
     }
 
+    /* Initialize backlight control pin */
+    if (!gpio_is_ready_dt(&backlight_pin)) {
+        BUTTON_ERROR("Error: backlight pin device is not ready\n");
+        return -ENODEV;
+    }
+    
+    ret = gpio_pin_configure_dt(&backlight_pin, GPIO_OUTPUT_ACTIVE);
+    if (ret != 0) {
+        BUTTON_ERROR("Error %d: failed to configure backlight pin\n", ret);
+        return ret;
+    }
+    
     /* Configure buttons as inputs with pull-up */
     ret = gpio_pin_configure_dt(&button1, GPIO_INPUT | GPIO_PULL_UP);
     if (ret != 0) {
@@ -151,6 +198,9 @@ int button_init(const struct device *disp_dev)
         return ret;
     }
 
+    /* Initialize backlight on */
+    gpio_pin_set_dt(&backlight_pin, 1);  // Set to 1 to turn ON
+    
     BUTTON_INFO("Button initialized successfully\n");
     return 0;
 }
@@ -166,7 +216,18 @@ void display_turn_on(void)
 {
     if (!display_on) {
         display_on = true;
+        /* Turn on backlight by setting pin HIGH */
+        gpio_pin_set_dt(&backlight_pin, 1);
+        
+        /* Then enable display through display API */
+        display_set_brightness(display_dev, 255);
         display_blanking_off(display_dev);
+        
+        /* Restore previous screen if available */
+        if (current_active_screen) {
+            lv_scr_load(current_active_screen);
+        }
+        
         BUTTON_INFO("Display manually turned ON\n");
     }
 }
@@ -176,7 +237,16 @@ void display_turn_off(void)
 {
     if (display_on) {
         display_on = false;
+        /* Save current screen before turning off */
+        current_active_screen = lv_scr_act();
+        
+        /* First blank the display through display API */
+        display_set_brightness(display_dev, 0);
         display_blanking_on(display_dev);
+        
+        /* Cut power to backlight by setting pin LOW */
+        gpio_pin_set_dt(&backlight_pin, 0);
+        
         BUTTON_INFO("Display manually turned OFF\n");
     }
 }
@@ -187,8 +257,5 @@ void bluetooth_button_handler(void)
     if (!is_ble_active()) {
         BUTTON_INFO("Restarting Bluetooth advertising\n");
         bluetooth_restart();
-    } else {
-        BUTTON_INFO("Stopping Bluetooth\n");
-        bluetooth_stop();
     }
 }
