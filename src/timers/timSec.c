@@ -1,6 +1,7 @@
 #include "../../inc/timSec.h"
 #include "../../inc/rtc.h"
 #include "../../inc/debug.h"
+#include "../../inc/sensors.h"
 #include <zephyr/kernel.h>
 
 // Variables pour le compteur de secours
@@ -13,6 +14,8 @@ static void fake_timer_expiry(struct k_timer *timer)
 {
     fake_time++;
     if (fake_time >= 24 * 3600) {
+        extern sensor_data_t g_sensor_data;
+        g_sensor_data.step_count = 0;  // Réinitialiser le compteur de pas
         fake_time = 0;  // Réinitialiser à minuit après 24h
     }
 }

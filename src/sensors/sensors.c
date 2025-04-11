@@ -23,7 +23,8 @@ sensor_data_t g_sensor_data = {
     .mag_y = 0.0,
     .mag_z = 0.0,
     .temperature = 0.0,
-    .humidity = 0.0
+    .humidity = 0.0,
+    .step_count = 0.0,
 };
 
 /* Semaphore for UI readiness - declared in main.c */
