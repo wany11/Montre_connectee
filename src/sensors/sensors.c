@@ -238,7 +238,7 @@ void sensors_run(void *p1, void *p2, void *p3)
     
     SENSORS_INFO("Sensors initialized successfully\n");
     
-    /* Main sensors thread just sleeps - timers control everything */
+    /* Main sensors thread just sleeps */
     while (1) {
         /* Sleep for a while */
         k_sleep(K_SECONDS(5));

@@ -10,6 +10,7 @@
         "button.h": "c",
         "rtc.h": "c",
         "touch_screen.h": "c",
-        "ui.h": "c"
+        "ui.h": "c",
+        "sensortimers.h": "c"
     }
 }
