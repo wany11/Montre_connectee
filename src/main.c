@@ -52,6 +52,8 @@ K_THREAD_DEFINE(sensor_thread_id, SENSOR_THREAD_STACK_SIZE, sensors_run, NULL, N
 K_THREAD_DEFINE(bluetooth_thread_id, BLE_THREAD_STACK_SIZE, bluetooth_run, NULL, NULL, NULL,
                 BLE_THREAD_PRIORITY, 0, 1000);
 
+/* Add this after the K_THREAD_DEFINE statement in main.c to make it accessible from bluetooth.c */
+
 struct k_msgq* get_msgq(void)
 {
     return &msgq;

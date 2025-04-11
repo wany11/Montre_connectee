@@ -32,3 +32,6 @@ void display_turn_on(void);
 void display_turn_off(void);
 
 #endif /* BUTTON_HANDLER_H */
+
+
+void bluetooth_button_handler(void);

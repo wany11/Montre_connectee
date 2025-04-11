@@ -131,9 +131,54 @@ static const struct bt_data ad[] = {
     // BT_DATA_BYTES(BT_DATA_UUID128_ALL, SENSOR_SERVICE_UUID_VAL),
 };
 
+/* Global variable to track if BLE is active */
+static bool ble_active = false;
+static bool ble_running = true;
+static struct k_sem ble_sem;
+
+/* Timeout values in milliseconds */
+#define BLE_CONNECTION_TIMEOUT_MS (5 * 1000)  // 60 seconds timeout if no connection
+
+/* Check if BLE is currently active */
+bool is_ble_active(void)
+{
+    return ble_active;
+}
+
+/* Restart Bluetooth advertising */
+void bluetooth_restart(void)
+{
+    if (!ble_running) {
+        ble_active = true;
+        ble_running = true;
+        k_sem_give(&ble_sem);  // Wake up the thread
+        BT_INFO("Bluetooth thread resuming\n");
+    }
+}
+
+/* Stop Bluetooth */
+void bluetooth_stop(void)
+{
+    if (ble_running) {
+        ble_active = false;
+        
+        if (current_conn) {
+            bt_conn_disconnect(current_conn, BT_HCI_ERR_REMOTE_USER_TERM_CONN);
+        }
+        
+        // Stop advertising
+        bt_le_adv_stop();
+        BT_INFO("Bluetooth advertising stopped\n");
+    }
+}
+
 void bluetooth_run(void)
 {
     int err;
+    uint32_t timeout_start;
+
+    /* Initialize the semaphore */
+    k_sem_init(&ble_sem, 0, 1);
 
     BT_INFO("Starting Custom Sensor Service\n");
 
@@ -151,35 +196,64 @@ void bluetooth_run(void)
     
     BT_INFO("Custom Sensor service initialized\n");
 
-    /* Start advertising */
-    err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), NULL, 0);
-    if (err) {
-        BT_ERROR("Advertising failed to start (err %d)\n", err);
-        return;
-    }
-
-    BT_INFO("Advertising successfully started\n");
-
-    /* Main loop - periodically send sensor data */
     while (1) {
-        if (connected_flag && notif_enabled) {
-            /* Format sensor data as a human-readable/JSON string */
-            format_sensor_data();
-            
-            size_t data_len = strlen(sensor_data_buffer);
-            if (data_len > 0) {
-                BT_VERBOSE("Sending sensor data: %s\n", sensor_data_buffer);
+        /* Start advertising */
+        err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), NULL, 0);
+        if (err) {
+            BT_ERROR("Advertising failed to start (err %d)\n", err);
+            k_sleep(K_SECONDS(5));  // Wait before trying again
+            continue;
+        }
+
+        BT_INFO("Advertising successfully started\n");
+        ble_active = true;
+        ble_running = true;
+        timeout_start = k_uptime_get_32();
+
+        /* Main processing loop - runs until timeout or manual stop */
+        while (ble_running) {
+            /* Check for timeout when not connected */
+            if (!connected_flag) {
+                uint32_t now = k_uptime_get_32();
+                if ((now - timeout_start) > BLE_CONNECTION_TIMEOUT_MS) {
+                    BT_INFO("Bluetooth connection timeout, stopping advertising\n");
+                    bt_le_adv_stop();
+                    ble_active = false;
+                    ble_running = false;
+                    break;  // Exit this inner loop
+                }
+            } else {
+                /* When connected, reset timeout counter */
+                timeout_start = k_uptime_get_32();
+            }
+
+            /* Only send data when connected and notifications enabled */
+            if (connected_flag && notif_enabled) {
+                /* Format sensor data as a human-readable/JSON string */
+                format_sensor_data();
                 
-                /* Send data via custom service notification */
-                err = bt_gatt_notify(NULL, &sensor_svc.attrs[1], 
-                                    sensor_data_buffer, data_len);
-                if (err) {
-                    BT_ERROR("Failed to send notification (err %d)\n", err);
+                size_t data_len = strlen(sensor_data_buffer);
+                if (data_len > 0) {
+                    BT_VERBOSE("Sending sensor data: %s\n", sensor_data_buffer);
+                    
+                    /* Send data via custom service notification */
+                    err = bt_gatt_notify(NULL, &sensor_svc.attrs[1], 
+                                        sensor_data_buffer, data_len);
+                    if (err) {
+                        BT_ERROR("Failed to send notification (err %d)\n", err);
+                    }
                 }
             }
+            
+            /* Sleep to avoid busy-waiting and preserve battery */
+            k_sleep(K_MSEC(500));
         }
-        
-        /* Sleep to avoid busy-waiting and preserve battery */
-        k_sleep(K_MSEC(500));
+
+        /* Thread is paused here until reactivated by button press */
+        if (!ble_running) {
+            BT_INFO("Bluetooth thread paused, waiting for button activation\n");
+            k_sem_take(&ble_sem, K_FOREVER);  // Wait until released by button press
+            BT_INFO("Bluetooth thread waking up\n");
+        }
     }
 }
