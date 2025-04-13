@@ -57,6 +57,8 @@
      LIS2MDL_VERBOSE("Observation: %u\n", obs);
  }
  
+ static int set_sampling_freq(const struct device *dev) __attribute__((unused));
+
  static int set_sampling_freq(const struct device *dev)
  {
      int ret = 0;
@@ -78,12 +80,15 @@
  }
  
  static void lis2mdl_handler(const struct device *dev,
+                const struct sensor_trigger *trig) __attribute__((unused));
+                
+static void lis2mdl_handler(const struct device *dev,
                 const struct sensor_trigger *trig)
- {
-     LIS2MDL_VERBOSE("Trigger handler called\n");
-     lis2mdl_process_sample(dev);
- }
- 
+{
+    LIS2MDL_VERBOSE("Trigger handler called\n");
+    lis2mdl_process_sample(dev);
+}
+
  bool my_lis2mdl_init(void)
  {
      LIS2MDL_INFO("Starting initialization\n");

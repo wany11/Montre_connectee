@@ -48,6 +48,13 @@ void bluetooth_restart(void);
  */
 void bluetooth_stop(void);
 
+/**
+ * @brief Handler for Bluetooth button press
+ *
+ * This function is called when a button press should trigger a Bluetooth action
+ */
+void bluetooth_button_handler(void);
+
 #ifdef __cplusplus
 }
 #endif

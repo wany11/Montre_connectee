@@ -57,6 +57,9 @@ static void hts221_process_sample(const struct device *dev)
 }
 
 static void hts221_handler(const struct device *dev,
+                           const struct sensor_trigger *trig) __attribute__((unused));
+
+static void hts221_handler(const struct device *dev,
                            const struct sensor_trigger *trig)
 {
     HTS221_VERBOSE("Trigger handler called\n");

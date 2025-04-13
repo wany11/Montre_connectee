@@ -6,6 +6,7 @@
 #include "../../ui/ui.h"
 #include <zephyr/kernel.h>
 #include "../../../inc/lsm6dso.h"  // Inclure l'en-tête du capteur LSM6DSO
+#include "../../../inc/ui_Screen6.h" // Inclure le fichier d'en-tête ui_Screen6.h
 
 // Déclaration externe pour la fonction de récupération du nombre de pas
 extern int lsm6dso_get_step_count(uint32_t *steps);
@@ -13,13 +14,6 @@ extern int lsm6dso_get_step_count(uint32_t *steps);
 // Déclaration externe pour les fonctions de détection d'activité
 extern bool lsm6dso_detect_activity(void);
 extern bool lsm6dso_is_activity_detected(void);
-
-// États du chronomètre
-typedef enum {
-    CHRONO_STOPPED,
-    CHRONO_RUNNING,
-    CHRONO_PAUSED
-} chrono_state_t;
 
 // Variables pour le chronomètre
 static chrono_state_t chrono_state = CHRONO_STOPPED;
@@ -37,6 +31,11 @@ static lv_obj_t *start_pause_label;
 static int64_t activity_start_time = 0;
 static int64_t activity_elapsed_time = 0;
 static bool activity_was_detected = false;
+
+// Déclaration préalable des fonctions pour éviter les erreurs
+static void update_chrono_display(void);
+static void update_step_display(void);
+static void update_activity_chrono_display(void);
 
 // Fonction pour mettre à jour l'affichage du chronomètre
 static void update_chrono_display(void)
@@ -88,6 +87,14 @@ void ui_set_step_count(uint32_t steps)
     update_step_display();
 }
 
+// Fonction publique pour réinitialiser le chronomètre d'activité
+void ui_reset_activity_chrono(void)
+{
+    activity_elapsed_time = 0;
+    activity_was_detected = false;
+    update_activity_chrono_display();
+}
+
 // Fonction pour mettre à jour l'affichage du chronomètre d'activité
 static void update_activity_chrono_display(void)
 {
@@ -125,26 +132,44 @@ static void step_update_timer_cb(lv_timer_t *timer)
 // Fonction de mise à jour du chronomètre d'activité
 static void activity_timer_cb(lv_timer_t *timer)
 {
-    // Vérifier l'activité actuelle via le capteur LSM6DSO
+    // Utiliser la fonction lsm6dso_detect_activity() pour détecter l'activité en temps réel
+    // Cette fonction fait l'analyse directe des données du capteur
     bool current_activity = lsm6dso_detect_activity();
     
+    // Obtenir le temps actuel
+    int64_t now = k_uptime_get();
+    
     if (current_activity) {
+        // Si c'est le début d'une période d'activité
         if (!activity_was_detected) {
-            // L'activité vient de commencer
             activity_was_detected = true;
-            activity_start_time = k_uptime_get();
-        } else {
-            // L'activité continue, mettre à jour le temps écoulé
-            int64_t now = k_uptime_get();
-            activity_elapsed_time += (now - activity_start_time);
             activity_start_time = now;
         }
+        // Pas besoin de mettre à jour le temps écoulé pendant l'activité
+        // Nous le ferons seulement à la fin d'une période d'activité
     } else {
-        // Pas d'activité
-        activity_was_detected = false;
+        // Si c'est la fin d'une période d'activité
+        if (activity_was_detected) {
+            // Ajouter le temps de cette période d'activité au total
+            activity_elapsed_time += (now - activity_start_time);
+            activity_was_detected = false;
+        }
     }
     
-    update_activity_chrono_display();
+    // Si on est toujours en activité, calculer le temps total incluant la période actuelle
+    int64_t total_elapsed = activity_elapsed_time;
+    if (activity_was_detected) {
+        total_elapsed += (now - activity_start_time);
+    }
+    
+    // Convertir en heures:minutes:secondes
+    unsigned int hours = total_elapsed / 3600000;
+    unsigned int min = (total_elapsed % 3600000) / 60000;
+    unsigned int sec = (total_elapsed % 60000) / 1000;
+    
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%02u:%02u:%02u", hours, min, sec);
+    lv_label_set_text(ui_chronometreActi, buf);
 }
 
 // Gestionnaire d'événement pour le bouton Start/Pause

@@ -16,6 +16,10 @@ static void fake_timer_expiry(struct k_timer *timer)
     if (g_current_hour == 0 && g_current_minute == 0 && g_current_second == 0) {
         extern sensor_data_t g_sensor_data;
         g_sensor_data.step_count = 0;  // Réinitialiser le compteur de pas à minuit
+        
+        // Réinitialiser également le chronomètre d'activité
+        extern void ui_reset_activity_chrono(void);
+        ui_reset_activity_chrono();
     }
 }
 

@@ -181,8 +181,8 @@ void update_calendar(void) {
     }
 
     // Mise à jour de l'année affichée
-    char year_str[5];
-    sprintf(year_str, "%d", year);
+    char year_str[8]; // Augmentation de la taille pour éviter un dépassement de buffer
+    snprintf(year_str, sizeof(year_str), "%d", year);
     lv_label_set_text(ui_year, year_str);
     
     // Calculer le premier jour du mois (formule de Zeller)
