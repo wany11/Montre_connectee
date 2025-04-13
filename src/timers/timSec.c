@@ -6,17 +6,16 @@
 
 // Variables pour le compteur de secours
 static bool rtc_available = false;
-static uint32_t fake_time = 56730;  // Temps en secondes depuis minuit
 static struct k_timer fake_timer;
 
-// Fonction de callback pour le timer de secours
+// Suppression de fake_time et utilisation des variables globales
 static void fake_timer_expiry(struct k_timer *timer)
 {
-    fake_time++;
-    if (fake_time >= 24 * 3600) {
+    increment_time(); // Appeler increment_time chaque seconde
+
+    if (g_current_hour == 0 && g_current_minute == 0 && g_current_second == 0) {
         extern sensor_data_t g_sensor_data;
-        g_sensor_data.step_count = 0;  // Réinitialiser le compteur de pas
-        fake_time = 0;  // Réinitialiser à minuit après 24h
+        g_sensor_data.step_count = 0;  // Réinitialiser le compteur de pas à minuit
     }
 }
 
@@ -31,33 +30,18 @@ void start_timer(void)
     } else {
         rtc_available = false;
         DEBUG_ERROR_PRINT("TIMER", "RTC non détectée, utilisation du compteur de secours\n");
-        
-        // Initialiser le timer de secours (1 seconde d'intervalle)
-        k_timer_init(&fake_timer, fake_timer_expiry, NULL);
-        k_timer_start(&fake_timer, K_SECONDS(1), K_SECONDS(1));
+
     }
+    // Initialiser le timer de secours (1 seconde d'intervalle)
+    k_timer_init(&fake_timer, fake_timer_expiry, NULL);
+    k_timer_start(&fake_timer, K_SECONDS(1), K_SECONDS(1));
 }
 
 /* Function to get the current time in seconds */
 uint32_t get_temps(void)
 {
-    if (rtc_available) {
-        uint16_t year;
-        uint8_t month, day, hour, minute, second;
-        
-        // Obtenir l'heure actuelle depuis le RTC
-        int ret = rtc_get_datetime(&year, &month, &day, &hour, &minute, &second);
-        if (ret < 0) {
-            DEBUG_ERROR_PRINT("TIMER", "Erreur lors de la lecture RTC set de l'heure système: %d\n", ret);
-            return fake_time;  // Utiliser le temps de secours en cas d'erreur
-        }
-        
-        // Convertir en secondes depuis minuit
-        return hour * 3600 + minute * 60 + second;
-    } else {
-        // Utiliser le compteur de secours
-        return fake_time;
-    }
+    // Utiliser les variables globales pour calculer le temps en secondes
+    return g_current_hour * 3600 + g_current_minute * 60 + g_current_second;
 }
 
 void format_time(uint32_t seconds, char *buffer, size_t buffer_size)
@@ -85,13 +69,14 @@ int set_time(uint8_t hour, uint8_t minute, uint8_t second,  uint16_t year, uint8
         // Définir la nouvelle heure tout en gardant la même date
         return rtc_set_datetime(year, month, day, hour, minute, second);
     } else {
-        // Définir l'heure sur le compteur de secours
+        // Définir l'heure sur les variables globales
         g_current_day = day;
         g_current_month = month;
         g_current_year = year;
-        fake_time = hour * 3600 + minute * 60 + second;
-        DEBUG_INFO_PRINT("TIMER", "Heure définie sur le compteur de secours: %02d:%02d:%02d\n", 
-                         hour, minute, second);
+        g_current_hour = hour;
+        g_current_minute = minute;
+        g_current_second = second;
+        DEBUG_INFO_PRINT("TIMER", "Heure définie sur les variables globales: %02d:%02d:%02d\n", hour, minute, second);
         return 0;
     }
 }

@@ -68,4 +68,8 @@
 #define BT_INFO(fmt, ...)    DEBUG_INFO_PRINT("BT", fmt, ##__VA_ARGS__)
 #define BT_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("BT", fmt, ##__VA_ARGS__)
 
+#define TIME_ERROR(fmt, ...)   DEBUG_ERROR_PRINT("TIME", fmt, ##__VA_ARGS__)
+#define TIME_INFO(fmt, ...)    DEBUG_INFO_PRINT("TIME", fmt, ##__VA_ARGS__)
+#define TIME_VERBOSE(fmt, ...) DEBUG_VERBOSE_PRINT("TIME", fmt, ##__VA_ARGS__)
+
 #endif /* DEBUG_H_ */

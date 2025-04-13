@@ -25,19 +25,13 @@ static const struct device *i2c_dev;
 #define RV8263_REG_CONTROL3   0x12
 
 /* Définition des variables globales */
-uint16_t g_current_year = 2000;
-uint8_t g_current_month = 1;
-uint8_t g_current_day = 11;
-uint8_t g_current_hour = 0;
-uint8_t g_current_minute = 0;
-uint8_t g_current_second = 0;
+uint16_t g_current_year = 2011;
+uint8_t g_current_month = 12;
+uint8_t g_current_day = 13;
+uint8_t g_current_hour = 12;
+uint8_t g_current_minute = 34;
+uint8_t g_current_second = 56;
 
-/* Met à jour les variables globales en appelant rtc_get_datetime */
-int rtc_update_global_time(void)
-{
-    return rtc_get_datetime(&g_current_year, &g_current_month, &g_current_day, 
-                           &g_current_hour, &g_current_minute, &g_current_second);
-}
 
 /* Fonction alias pour résoudre l'erreur de build */
 int rtc_get_datetimes(uint16_t *year, uint8_t *month, uint8_t *day,
@@ -124,10 +118,29 @@ int rtc_set_datetime(uint16_t year, uint8_t month, uint8_t day,
     return 0;
 }
 
+// Suppression des doublons et uniformisation des fonctions
 int rtc_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day,
                      uint8_t *hour, uint8_t *minute, uint8_t *second)
 {
+    // Lire les variables globales
+    *year = g_current_year;
+    *month = g_current_month;
+    *day = g_current_day;
+    *hour = g_current_hour;
+    *minute = g_current_minute;
+    *second = g_current_second;
+
+    // Afficher un message TIME_INFO
+    TIME_INFO("Heure actuelle lue: %04d-%02d-%02d %02d:%02d:%02d\n",
+              *year, *month, *day, *hour, *minute, *second);
+
+    return 0;
+}
+
+int rtc_sync_global_time(void)
+{
     if (i2c_dev == NULL) {
+        RTC_ERROR("RTC device not initialized\n");
         return -ENODEV;
     }
 
@@ -140,7 +153,73 @@ int rtc_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day,
         RTC_ERROR("Impossible de lire les secondes: %d\n", ret);
         return ret;
     }
-    *second = bcd2bin(data & 0x7F);  // Masquer bit de gestion
+    g_current_second = bcd2bin(data & 0x7F);  // Masquer bit de gestion
+
+    // Lecture des minutes
+    ret = i2c_reg_read_byte(i2c_dev, RV8263_I2C_ADDR, RV8263_REG_MINUTES, &data);
+    if (ret < 0) {
+        RTC_ERROR("Impossible de lire les minutes: %d\n", ret);
+        return ret;
+    }
+    g_current_minute = bcd2bin(data & 0x7F);
+
+    // Lecture des heures
+    ret = i2c_reg_read_byte(i2c_dev, RV8263_I2C_ADDR, RV8263_REG_HOURS, &data);
+    if (ret < 0) {
+        RTC_ERROR("Impossible de lire les heures: %d\n", ret);
+        return ret;
+    }
+    g_current_hour = bcd2bin(data & 0x3F);
+
+    // Lecture du jour
+    ret = i2c_reg_read_byte(i2c_dev, RV8263_I2C_ADDR, RV8263_REG_DAYS, &data);
+    if (ret < 0) {
+        RTC_ERROR("Impossible de lire le jour: %d\n", ret);
+        return ret;
+    }
+    g_current_day = bcd2bin(data & 0x3F);
+
+    // Lecture du mois
+    ret = i2c_reg_read_byte(i2c_dev, RV8263_I2C_ADDR, RV8263_REG_MONTHS, &data);
+    if (ret < 0) {
+        RTC_ERROR("Impossible de lire le mois: %d\n", ret);
+        return ret;
+    }
+    g_current_month = bcd2bin(data & 0x1F);
+
+    // Lecture de l'année
+    ret = i2c_reg_read_byte(i2c_dev, RV8263_I2C_ADDR, RV8263_REG_YEARS, &data);
+    if (ret < 0) {
+        RTC_ERROR("Impossible de lire l'année: %d\n", ret);
+        return ret;
+    }
+    g_current_year = 2000 + bcd2bin(data);
+
+    RTC_INFO("Synchronisation avec la RTC réussie: %04d-%02d-%02d %02d:%02d:%02d\n",
+             g_current_year, g_current_month, g_current_day,
+             g_current_hour, g_current_minute, g_current_second);
+
+    return 0;
+}
+
+int rtc_read_date(uint16_t *year, uint8_t *month, uint8_t *day,
+                  uint8_t *hour, uint8_t *minute, uint8_t *second)
+{
+    if (i2c_dev == NULL) {
+        RTC_ERROR("RTC device not initialized\n");
+        return -ENODEV;
+    }
+
+    int ret;
+    uint8_t data;
+
+    // Lecture des secondes
+    ret = i2c_reg_read_byte(i2c_dev, RV8263_I2C_ADDR, RV8263_REG_SECONDS, &data);
+    if (ret < 0) {
+        RTC_ERROR("Impossible de lire les secondes: %d\n", ret);
+        return ret;
+    }
+    *second = bcd2bin(data & 0x7F);
 
     // Lecture des minutes
     ret = i2c_reg_read_byte(i2c_dev, RV8263_I2C_ADDR, RV8263_REG_MINUTES, &data);
@@ -180,20 +259,55 @@ int rtc_get_datetime(uint16_t *year, uint8_t *month, uint8_t *day,
         RTC_ERROR("Impossible de lire l'année: %d\n", ret);
         return ret;
     }
-    // Année 20xx
     *year = 2000 + bcd2bin(data);
 
-    // Mettre à jour les variables globales en même temps
-    g_current_year = *year;
-    g_current_month = *month;
-    g_current_day = *day;
-    g_current_hour = *hour;
-    g_current_minute = *minute;
-    g_current_second = *second;
+    RTC_INFO("Date lue depuis la RTC: %04d-%02d-%02d %02d:%02d:%02d\n",
+             *year, *month, *day, *hour, *minute, *second);
 
-    RTC_INFO("Heure actuelle: %04d-%02d-%02d %02d:%02d:%02d\n",
-            *year, *month, *day, *hour, *minute, *second);
     return 0;
+}
+
+void increment_time(void)
+{
+    g_current_second++;
+
+    if (g_current_second >= 60) {
+        g_current_second = 0;
+        g_current_minute++;
+
+        if (g_current_minute >= 60) {
+            g_current_minute = 0;
+            g_current_hour++;
+
+            if (g_current_hour >= 24) {
+                g_current_hour = 0;
+                g_current_day++;
+
+                // Déterminer le nombre de jours dans le mois
+                uint8_t days_in_month;
+                if (g_current_month == 2) { // Février
+                    days_in_month = ((g_current_year % 4 == 0 && g_current_year % 100 != 0) || g_current_year % 400 == 0) ? 29 : 28;
+                } else if (g_current_month == 4 || g_current_month == 6 || g_current_month == 9 || g_current_month == 11) {
+                    days_in_month = 30;
+                } else {
+                    days_in_month = 31;
+                }
+
+                if (g_current_day > days_in_month) {
+                    g_current_day = 1;
+                    g_current_month++;
+
+                    if (g_current_month > 12) {
+                        g_current_month = 1;
+                        g_current_year++;
+                    }
+                }
+            }
+        }
+    }
+    TIME_INFO("Heure actuelle: %04d-%02d-%02d %02d:%02d:%02d\n",
+             g_current_year, g_current_month, g_current_day,
+             g_current_hour, g_current_minute, g_current_second);
 }
 
 

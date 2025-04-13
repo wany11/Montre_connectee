@@ -10,17 +10,20 @@ static volatile bool sensors_running = false;
 static k_tid_t hts221_task_tid;
 static k_tid_t lis2mdl_task_tid;
 static k_tid_t lsm6dso_task_tid;
+static k_tid_t rtc_sync_task_tid;
 
 /* Task thread data */
 static struct k_thread hts221_task_data;
 static struct k_thread lis2mdl_task_data;
 static struct k_thread lsm6dso_task_data;
+static struct k_thread rtc_sync_task_data;
 
 /* Task thread stacks */
 #define TASK_STACK_SIZE 1024
 K_THREAD_STACK_DEFINE(hts221_task_stack, TASK_STACK_SIZE);
 K_THREAD_STACK_DEFINE(lis2mdl_task_stack, TASK_STACK_SIZE);
 K_THREAD_STACK_DEFINE(lsm6dso_task_stack, TASK_STACK_SIZE);
+K_THREAD_STACK_DEFINE(rtc_sync_task_stack, TASK_STACK_SIZE);
 
 /* HTS221 task function - 30 second interval */
 static void hts221_task_func(void *p1, void *p2, void *p3)
@@ -85,6 +88,27 @@ static void lsm6dso_task_func(void *p1, void *p2, void *p3)
     SENSORS_INFO("LSM6DSO task thread exited\n");
 }
 
+/* RTC sync task function - 1 hour interval */
+static void rtc_sync_task_func(void *p1, void *p2, void *p3)
+{
+    SENSORS_INFO("RTC sync task thread started\n");
+
+    while (sensors_running) {
+        int ret = rtc_sync_global_time();
+        if (ret == 0) {
+            SENSORS_INFO("RTC successfully synchronized\n");
+        } else {
+            SENSORS_ERROR("RTC synchronization failed\n");
+        }
+
+        /* Sleep for 1 hour before next synchronization */
+        k_sleep(K_HOURS(1));
+        // k_sleep(K_SECONDS(60));
+    }
+
+    SENSORS_INFO("RTC sync task thread exited\n");
+}
+
 void init_sensor_timers(void)
 {
     /* No initialization needed for tasks until start_sensor_timers is called */
@@ -125,6 +149,16 @@ void start_sensor_timers(void)
                                       5, 0, K_SECONDS(3));
     k_thread_name_set(lsm6dso_task_tid, "lsm6dso_task");
     SENSORS_INFO("LSM6DSO task started with 250ms intervals\n");
+
+    /* Create and start RTC sync task with initial 1 second delay */
+    rtc_sync_task_tid = k_thread_create(&rtc_sync_task_data, 
+                                        rtc_sync_task_stack,
+                                        K_THREAD_STACK_SIZEOF(rtc_sync_task_stack),
+                                        rtc_sync_task_func,
+                                        NULL, NULL, NULL,
+                                        5, 0, K_SECONDS(1));
+    k_thread_name_set(rtc_sync_task_tid, "rtc_sync_task");
+    SENSORS_INFO("RTC sync task started with 1-hour intervals\n");
 }
 
 void stop_sensor_timers(void)

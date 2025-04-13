@@ -34,7 +34,7 @@ static int cmd_rtc_set(const struct shell *sh, size_t argc, char **argv)
     uint8_t jour, mois;
     uint8_t heure, minute, seconde;
     
-    int ret_get = rtc_get_datetime(&annee, &mois, &jour, &heure, &minute, &seconde);
+    int ret_get = rtc_read_date(&annee, &mois, &jour, &heure, &minute, &seconde);
     if (ret_get) {
         shell_error(sh, "Erreur lors de la récupération de la date: %d", ret_get);
         return ret_get;
@@ -77,7 +77,7 @@ static int cmd_rtc_set_date(const struct shell *sh, size_t argc, char **argv)
     uint8_t jour_actuel, mois_actuel;
     uint8_t heure, minute, seconde;
     
-    int ret_get = rtc_get_datetime(&annee_actuelle, &mois_actuel, &jour_actuel, &heure, &minute, &seconde);
+    int ret_get = rtc_read_date(&annee_actuelle, &mois_actuel, &jour_actuel, &heure, &minute, &seconde);
     if (ret_get) {
         shell_error(sh, "Erreur lors de la récupération de l'heure: %d", ret_get);
         return ret_get;
@@ -101,7 +101,7 @@ static int cmd_rtc_get(const struct shell *sh, size_t argc, char **argv)
     uint8_t jour, mois;
     uint8_t heure, minute, seconde;
     
-    int ret = rtc_get_datetime(&annee, &mois, &jour, &heure, &minute, &seconde);
+    int ret = rtc_read_date(&annee, &mois, &jour, &heure, &minute, &seconde);
     if (ret) {
         shell_error(sh, "Erreur de lecture RTC: %d", ret);
     } else {
@@ -118,7 +118,7 @@ static int cmd_rtc_get_date(const struct shell *sh, size_t argc, char **argv)
     uint8_t jour, mois;
     uint8_t heure, minute, seconde;
     
-    int ret = rtc_get_datetime(&annee, &mois, &jour, &heure, &minute, &seconde);
+    int ret = rtc_read_date(&annee, &mois, &jour, &heure, &minute, &seconde);
     if (ret) {
         shell_error(sh, "Erreur de lecture de la date RTC: %d", ret);
     } else {

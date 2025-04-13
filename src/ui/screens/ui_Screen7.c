@@ -15,7 +15,7 @@ extern uint8_t g_current_day;
 extern uint8_t g_current_hour;
 extern uint8_t g_current_minute;
 extern uint8_t g_current_second;
-extern int rtc_update_global_time(void);
+extern int rtc_sync_global_time(void);
 
 static lv_obj_t *calendar_days[42]; // Max 6 lignes de 7 jours
 static lv_style_t style_current_day;
@@ -166,7 +166,7 @@ void ui_Screen7_screen_init(void)
 
 void update_calendar(void) {
     // Mettre à jour les variables globales
-    rtc_update_global_time();
+    rtc_sync_global_time();
     
     // Utiliser les variables globales au lieu d'appeler rtc_get_datetime
     uint16_t year = g_current_year;

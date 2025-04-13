@@ -115,28 +115,14 @@ int main(void)
     start_timer();
     printk("Timer started\n");
 
-    /* RTC initialization */
-    if (rtc_init() == 0) {
-        /* Update the global time */
-        rtc_update_global_time();
-    }
-
     /* Main loop */
     while (1) {
         /* Process touchscreen events */
         uint32_t sleep_ms = touch_screen_process();
-        
-        /* Update global time variables once per second */
-        static uint32_t last_time_update = 0;
-        uint32_t current_time = k_uptime_get_32();
-        if (current_time - last_time_update >= 1000) {
-            rtc_update_global_time();
-            last_time_update = current_time;
-        }
-        
+
         /* Update analog clock */
         ui_update_analog_clock();
-        
+
         /* Limit to max 50 FPS */
         k_msleep(MIN(sleep_ms, 20));
     }

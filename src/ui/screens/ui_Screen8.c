@@ -15,7 +15,7 @@ extern uint8_t g_current_day;
 extern uint8_t g_current_hour;
 extern uint8_t g_current_minute;
 extern uint8_t g_current_second;
-extern int rtc_update_global_time(void);
+extern int rtc_sync_global_time(void);
 extern int rtc_set_datetime(uint16_t year, uint8_t month, uint8_t day,
                            uint8_t hour, uint8_t minute, uint8_t second);
 
@@ -70,7 +70,7 @@ void ui_Screen8_screen_init(void)
     }
 
     // Initialize with current time - add error handling
-    if (rtc_update_global_time() != 0) {
+    if (rtc_sync_global_time() != 0) {
         // Use default values if RTC update fails
         set_year = 2023;
         set_month = 1;
@@ -488,7 +488,7 @@ static void save_button_event_cb(lv_event_t *e)
     
     if (ret == 0) {
         // Success, update global time variables
-        rtc_update_global_time();
+        rtc_sync_global_time();
         
         // Show success message
         msgbox = lv_msgbox_create(NULL, "Success", "Date and time updated", btns, false);
