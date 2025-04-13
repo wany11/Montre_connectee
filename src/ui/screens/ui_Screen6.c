@@ -28,6 +28,11 @@ static int64_t chrono_elapsed_time = 0;
 static lv_timer_t *chrono_timer = NULL;
 static uint32_t step_count = 0;
 
+// Boutons pour le chronomètre
+static lv_obj_t *start_pause_btn;
+static lv_obj_t *reset_btn;
+static lv_obj_t *start_pause_label;
+
 // Variables pour le chronomètre d'activité
 static int64_t activity_start_time = 0;
 static int64_t activity_elapsed_time = 0;
@@ -55,11 +60,16 @@ static void update_chrono_display(void)
     
     // Mise à jour de l'affichage du bouton selon l'état
     if (chrono_state == CHRONO_STOPPED) {
-        lv_label_set_text(ui_test, "Start");
+        lv_label_set_text(start_pause_label, "Start");
+        // Désactiver le bouton Reset lorsque le chronomètre est arrêté
+        lv_obj_add_state(reset_btn, LV_STATE_DISABLED);
     } else if (chrono_state == CHRONO_RUNNING) {
-        lv_label_set_text(ui_test, "Pause");
+        lv_label_set_text(start_pause_label, "Pause");
+        // Activer le bouton Reset
+        lv_obj_clear_state(reset_btn, LV_STATE_DISABLED);
     } else if (chrono_state == CHRONO_PAUSED) {
-        lv_label_set_text(ui_test, "Reset");
+        lv_label_set_text(start_pause_label, "Start");
+        // Bouton Reset déjà actif
     }
 }
 
@@ -137,31 +147,55 @@ static void activity_timer_cb(lv_timer_t *timer)
     update_activity_chrono_display();
 }
 
-// Fonction à appeler lorsqu'on appuie sur la zone tactile
-void chrono_button_handler(void)
+// Gestionnaire d'événement pour le bouton Start/Pause
+static void start_pause_event_cb(lv_event_t *e)
 {
     switch (chrono_state) {
         case CHRONO_STOPPED:
             // Démarrer le chronomètre
             chrono_state = CHRONO_RUNNING;
             chrono_start_time = k_uptime_get();
-            chrono_elapsed_time = 0;
+            lv_label_set_text(start_pause_label, "Pause");
+            // Activer le bouton Reset
+            lv_obj_clear_state(reset_btn, LV_STATE_DISABLED);
             break;
             
         case CHRONO_RUNNING:
             // Mettre en pause
             chrono_state = CHRONO_PAUSED;
             chrono_elapsed_time += (k_uptime_get() - chrono_start_time);
+            lv_label_set_text(start_pause_label, "Start");
             break;
             
         case CHRONO_PAUSED:
-            // Réinitialiser
-            chrono_state = CHRONO_STOPPED;
-            chrono_elapsed_time = 0;
+            // Reprendre le chronomètre
+            chrono_state = CHRONO_RUNNING;
+            chrono_start_time = k_uptime_get();
+            lv_label_set_text(start_pause_label, "Pause");
             break;
     }
     
     update_chrono_display();
+}
+
+// Gestionnaire d'événement pour le bouton Reset
+static void reset_event_cb(lv_event_t *e)
+{
+    if (chrono_state != CHRONO_STOPPED) {
+        // Réinitialiser le chronomètre
+        chrono_state = CHRONO_STOPPED;
+        chrono_elapsed_time = 0;
+        lv_label_set_text(start_pause_label, "Start");
+        // Désactiver le bouton Reset car le chronomètre est arrêté
+        lv_obj_add_state(reset_btn, LV_STATE_DISABLED);
+        update_chrono_display();
+    }
+}
+
+// Fonction à appeler lorsqu'on appuie sur la zone tactile - conservée pour compatibilité
+void chrono_button_handler(void)
+{
+    // Cette fonction est maintenant remplacée par les gestionnaires d'événements des boutons
 }
 
 void ui_Screen6_screen_init(void)
@@ -207,18 +241,37 @@ void ui_Screen6_screen_init(void)
     lv_obj_set_style_text_color(ui_distance, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_distance, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_test = lv_label_create(ui_Screen6);
-    lv_obj_set_width(ui_test, LV_SIZE_CONTENT);   /// 5
-    lv_obj_set_height(ui_test, LV_SIZE_CONTENT);    /// 100
-    lv_obj_set_x(ui_test, -0);
-    lv_obj_set_y(ui_test, 0);
-    lv_obj_set_align(ui_test, LV_ALIGN_CENTER);
-    lv_obj_set_style_text_color(ui_test, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_test, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
+    // Supprimer l'ancien label ui_test et le remplacer par de vrais boutons
+    
+    // Bouton Start/Pause
+    start_pause_btn = lv_btn_create(ui_Screen6);
+    lv_obj_set_width(start_pause_btn, 80);
+    lv_obj_set_height(start_pause_btn, 40);
+    lv_obj_set_x(start_pause_btn, -50);
+    lv_obj_set_y(start_pause_btn, 0);
+    lv_obj_set_align(start_pause_btn, LV_ALIGN_CENTER);
+    lv_obj_add_event_cb(start_pause_btn, start_pause_event_cb, LV_EVENT_CLICKED, NULL);
+    
+    start_pause_label = lv_label_create(start_pause_btn);
+    lv_obj_set_align(start_pause_label, LV_ALIGN_CENTER);
+    lv_label_set_text(start_pause_label, "Start");
+    
+    // Bouton Reset
+    reset_btn = lv_btn_create(ui_Screen6);
+    lv_obj_set_width(reset_btn, 80);
+    lv_obj_set_height(reset_btn, 40);
+    lv_obj_set_x(reset_btn, 50);
+    lv_obj_set_y(reset_btn, 0);
+    lv_obj_set_align(reset_btn, LV_ALIGN_CENTER);
+    lv_obj_add_event_cb(reset_btn, reset_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_state(reset_btn, LV_STATE_DISABLED); // Désactivé au début
+    
+    lv_obj_t *reset_label = lv_label_create(reset_btn);
+    lv_obj_set_align(reset_label, LV_ALIGN_CENTER);
+    lv_label_set_text(reset_label, "Reset");
+    
     // Initialiser l'affichage du chronomètre
     lv_label_set_text(ui_Chronometre, "00:00.00");
-    lv_label_set_text(ui_test, "Start");
     
     // Initialiser l'affichage du nombre de pas
     uint32_t initial_steps = 0;

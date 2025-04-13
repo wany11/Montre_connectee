@@ -99,16 +99,7 @@ uint32_t touch_screen_process(void)
         if (current_time - last_touch_time > TOUCH_DEBOUNCE_DELAY_MS) {
             last_touch_time = current_time;
             
-            // Vérifiez si nous sommes sur Screen6 et dans la zone du chronomètre
-            if (lv_scr_act() == ui_Screen6 && 
-                touch_point.x >= 67 && touch_point.x <= 170 && 
-                touch_point.y >= 88 && touch_point.y <= 223) {
-                
-                printk("Chronomètre activé à x=%d, y=%d\n", touch_point.x, touch_point.y);
-                chrono_button_handler();
-            }
-
-            else if (touch_point.y > 250) {
+            if (touch_point.y > 250) {
                 if (lv_scr_act() == ui_Screen2 || lv_scr_act() == NULL) {
                     _ui_screen_change(&ui_Screen8, LV_SCR_LOAD_ANIM_FADE_ON, 10, 0, &ui_Screen8_screen_init);
                 } else if (lv_scr_act() == ui_Screen3) {
