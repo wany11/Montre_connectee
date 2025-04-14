@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2020 Yestin Sun
- *
- * SPDX-License-Identifier: Apache-2.0
- */
 
  #include <stdio.h>
  #include <zephyr/kernel.h>
@@ -12,7 +7,7 @@
  #include <math.h>
  #include "../../inc/sensors.h"
  #include "../../inc/queue.h"
- #include "../../inc/debug.h"  /* Include the debug header */
+ #include "../../inc/debug.h"
  
  /* LSM6DSO message types to enum in queue.h:
   * MSG_TYPE_ACCEL_X, MSG_TYPE_ACCEL_Y, MSG_TYPE_ACCEL_Z,
@@ -219,13 +214,12 @@
      
      /* Configure accelerometer for better sensitivity for step detection */
      struct sensor_value full_scale;
-     full_scale.val1 = 4;  // 4g full scale
+     full_scale.val1 = 4;
      full_scale.val2 = 0;
      
      if (sensor_attr_set(lsm6dso_dev, SENSOR_CHAN_ACCEL_XYZ, 
                         SENSOR_ATTR_FULL_SCALE, &full_scale) != 0) {
          LSM6DSO_ERROR("Failed to set accelerometer full scale\n");
-         // Non-fatal, continue
      }
      
      /* Reset step counter */

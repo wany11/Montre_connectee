@@ -5,7 +5,7 @@
 #include <zephyr/sys/util.h>
 #include "../../inc/sensors.h"
 #include "../../inc/queue.h"
-#include "../../inc/debug.h"  /* Include the debug header */
+#include "../../inc/debug.h"
 
 
 static const struct device *hts221_dev = NULL;
@@ -70,15 +70,12 @@ bool my_hts221_init(void)
 {
     HTS221_INFO("Starting initialization\n");
 
-    /* Try to get the HTS221 device with various methods */
     
-    /* First, try to use DT_ALIAS */
     hts221_dev = DEVICE_DT_GET_ANY(st_hts221);
     
     if (hts221_dev == NULL) {
         HTS221_VERBOSE("Could not find device with DEVICE_DT_GET_ANY\n");
         
-        /* If that fails, try a more direct approach */
         hts221_dev = device_get_binding("HTS221");
         
         if (hts221_dev == NULL) {
@@ -95,7 +92,7 @@ bool my_hts221_init(void)
 
     HTS221_INFO("Device found and ready\n");
     
-    // HTS221_INFO("Temperature and humidity sensor initialized successfully\n");
+    HTS221_INFO("Temperature and humidity sensor initialized successfully\n");
     return true;
 }
 

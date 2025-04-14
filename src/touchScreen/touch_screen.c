@@ -9,7 +9,7 @@
 #include <zephyr/sys/util.h>
 #include "../ui/ui.h"
 #include "../../inc/touch_screen.h"
-#include "../../inc/chronometer.h" // Ajout de l'inclusion du fichier chronometer.h
+#include "../../inc/chronometer.h"
 #include <lvgl.h>
 
 LOG_MODULE_REGISTER(touch_screen, CONFIG_LOG_DEFAULT_LEVEL);
@@ -17,7 +17,7 @@ LOG_MODULE_REGISTER(touch_screen, CONFIG_LOG_DEFAULT_LEVEL);
 #define REFRESH_RATE 100
 
 // Définition des délais d'anti-rebond (en ms)
-#define TOUCH_DEBOUNCE_DELAY_MS 400  // Réduit de 300ms à 180ms pour plus de réactivité
+#define TOUCH_DEBOUNCE_DELAY_MS 400
 
 static const struct device *const touch_dev = DEVICE_DT_GET(DT_NODELABEL(tsc2007_adafruit_2_8_tft_touch_v2));
  
@@ -91,7 +91,7 @@ uint32_t touch_screen_process(void)
                 touch_point.x, touch_point.y);
     }
 
-    // Vérifiez si nous avons des événements tactiles
+    // Vérifie si nous avons des événements tactiles
     if (touch_point.pressed) {
         uint32_t current_time = k_uptime_get_32();
         

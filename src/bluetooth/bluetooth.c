@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2018 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
- */
-
 #include <zephyr/types.h>
 #include <stddef.h>
 #include <string.h>
@@ -128,7 +122,6 @@ BT_GATT_SERVICE_DEFINE(sensor_svc,
 static const struct bt_data ad[] = {
     BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
     BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
-    // BT_DATA_BYTES(BT_DATA_UUID128_ALL, SENSOR_SERVICE_UUID_VAL),
 };
 
 /* Global variable to track if BLE is active */
@@ -137,7 +130,7 @@ static bool ble_running = true;
 static struct k_sem ble_sem;
 
 /* Timeout values in milliseconds */
-#define BLE_CONNECTION_TIMEOUT_MS (30 * 1000)  // 60 seconds timeout if no connection
+#define BLE_CONNECTION_TIMEOUT_MS (30 * 1000)  // 30 seconds timeout if no connection
 
 /* Check if BLE is currently active */
 bool is_ble_active(void)
@@ -220,7 +213,7 @@ void bluetooth_run(void)
                     bt_le_adv_stop();
                     ble_active = false;
                     ble_running = false;
-                    break;  // Exit this inner loop
+                    break;
                 }
             } else {
                 /* When connected, reset timeout counter */

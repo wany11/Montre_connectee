@@ -1,8 +1,3 @@
-/*
- * Button handler for nRF5340DK
- * Handles button interrupts and display toggling
- */
-
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/display.h>
@@ -14,7 +9,7 @@
 #define BUTTON1_NODE DT_ALIAS(sw0)
 #define BUTTON2_NODE DT_ALIAS(sw1)
 #define BUTTON_DEBOUNCE_DELAY_MS 50
-#define BUTTON_MIN_INTERVAL_MS 200  // Temps minimum entre deux pressions
+#define BUTTON_MIN_INTERVAL_MS 200
 
 /* Define the backlight control pin - PI.05 on nRF5340DK */
 static const struct gpio_dt_spec backlight_pin = {
@@ -84,7 +79,7 @@ static void button_pressed_work_handler(struct k_work *work)
         BUTTON_INFO("Backlight pin clear result: %d\n", ret);
         
         /* Force a small delay to ensure the commands execute */
-        k_sleep(K_MSEC(50)); // Increased delay
+        k_sleep(K_MSEC(50));
     }
 }
 

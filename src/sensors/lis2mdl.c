@@ -1,16 +1,10 @@
-/*
- * Copyright (c) 2020 Yestin Sun
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
  #include <stdio.h>
  #include <zephyr/kernel.h>
  #include <zephyr/device.h>
  #include <zephyr/drivers/sensor.h>
  #include "../../inc/sensors.h"
  #include "../../inc/queue.h"
- #include "../../inc/debug.h"  /* Include the debug header */
+ #include "../../inc/debug.h"
  
  static const struct device *lis2mdl_dev = NULL;
  
@@ -115,11 +109,6 @@ static void lis2mdl_handler(const struct device *dev,
      }
  
      LIS2MDL_INFO("Device found and ready\n");
- 
-    //  if (set_sampling_freq(lis2mdl_dev) != 0) {
-    //      LIS2MDL_ERROR("Failed to set sampling frequency\n");
-    //      return false;
-    //  }
      
      LIS2MDL_INFO("Magnetometer initialized successfully\n");
      return true;

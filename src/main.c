@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2024 LVGL <felipe@lvgl.io>
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/display.h>
 #include <lvgl.h>
@@ -42,7 +36,6 @@ K_MSGQ_DEFINE(msgq, sizeof(sensor_msg_t), MAX_SENSOR_MSGS, 4);
 /* Define the semaphore for UI readiness */
 K_SEM_DEFINE(ui_ready_sem, 0, 1);
 
-/* Define threads at file scope, not inside a function */
 K_THREAD_DEFINE(ui_thread_id, UI_THREAD_STACK_SIZE, ui_thread_entry, NULL, NULL, NULL,
                 UI_THREAD_PRIORITY, 0, 0);
                 
@@ -52,14 +45,11 @@ K_THREAD_DEFINE(sensor_thread_id, SENSOR_THREAD_STACK_SIZE, sensors_run, NULL, N
 K_THREAD_DEFINE(bluetooth_thread_id, BLE_THREAD_STACK_SIZE, bluetooth_run, NULL, NULL, NULL,
                 BLE_THREAD_PRIORITY, 0, 1000);
 
-/* Add this after the K_THREAD_DEFINE statement in main.c to make it accessible from bluetooth.c */
-
 struct k_msgq* get_msgq(void)
 {
     return &msgq;
 }
 
-/* Declare the external function */
 extern void ui_update_analog_clock(void);
 
 int main(void)
@@ -77,13 +67,11 @@ int main(void)
     /* Initialize button handler */
     if (button_init(display_dev) != 0) {
         MAIN_ERROR("Button initialization failed\n");
-        /* Continue anyway, as this is not critical */
     }
 
     /* Initialize touchscreen */
     if (touch_screen_init() != 0) {
         MAIN_ERROR("Touchscreen initialization failed\n");
-        /* Continue anyway, as this might not be critical */
     } else {
         MAIN_INFO("Touchscreen initialized\n");
     }

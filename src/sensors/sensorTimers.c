@@ -2,7 +2,7 @@
 #include "../../inc/sensors.h"
 #include "../../inc/debug.h"
 #include "../../inc/sensorTimers.h"
-#include "../../inc/rtc.h" // Ajout de l'inclusion pour rtc_sync_global_time
+#include "../../inc/rtc.h"
 
 /* Flags to control task execution */
 static volatile bool sensors_running = false;

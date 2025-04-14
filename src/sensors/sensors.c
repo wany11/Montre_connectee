@@ -8,9 +8,9 @@
 #include "../../inc/hts221.h"
 #include "../../inc/lsm6dso.h"
 #include "../../inc/lis2mdl.h"
-#include "../../inc/debug.h"  /* Include the debug header */
+#include "../../inc/debug.h"
 #include "../../inc/sensorTimers.h"
-#include "../../inc/rtc.h" // Include RTC header
+#include "../../inc/rtc.h"
 
 /* Global sensor data structure */
 sensor_data_t g_sensor_data = {
@@ -34,26 +34,26 @@ extern struct k_sem ui_ready_sem;
 static struct k_sem hts221_sem;
 static struct k_sem lis2mdl_sem;
 static struct k_sem lsm6dso_sem;
-static struct k_sem rtc_sem; // Semaphore for RTC synchronization
+static struct k_sem rtc_sem;
 
 /* Define thread stacks */
 #define STACK_SIZE 1024
 K_THREAD_STACK_DEFINE(hts221_stack, STACK_SIZE);
 K_THREAD_STACK_DEFINE(lis2mdl_stack, STACK_SIZE);
 K_THREAD_STACK_DEFINE(lsm6dso_stack, STACK_SIZE);
-K_THREAD_STACK_DEFINE(rtc_stack, STACK_SIZE); // Define thread stack for RTC
+K_THREAD_STACK_DEFINE(rtc_stack, STACK_SIZE);
 
 /* Thread data structures */
 static struct k_thread hts221_thread_data;
 static struct k_thread lis2mdl_thread_data;
 static struct k_thread lsm6dso_thread_data;
-static struct k_thread rtc_thread_data; // Thread data structure for RTC
+static struct k_thread rtc_thread_data;
 
 /* Thread IDs */
 static k_tid_t hts221_tid;
 static k_tid_t lis2mdl_tid;
 static k_tid_t lsm6dso_tid;
-static k_tid_t rtc_tid; // Thread ID for RTC
+static k_tid_t rtc_tid;
 
 /* Thread functions */
 static void hts221_thread_func(void *p1, void *p2, void *p3)
@@ -105,7 +105,6 @@ static void rtc_thread_func(void *p1, void *p2, void *p3)
             SENSORS_INFO("RTC synchronization successful\n");
         } else {
             SENSORS_ERROR("RTC synchronization failed, using fake timer\n");
-            // Fallback to fake timer logic here
         }
 
         // Sleep for 1 hour before the next synchronization
@@ -203,7 +202,7 @@ void sensors_init(void)
     k_sem_init(&hts221_sem, 0, 1);
     k_sem_init(&lis2mdl_sem, 0, 1);
     k_sem_init(&lsm6dso_sem, 0, 1);
-    k_sem_init(&rtc_sem, 0, 1); // Initialize RTC semaphore
+    k_sem_init(&rtc_sem, 0, 1);
     
     /* Initialize HTS221 temperature and humidity sensor */
     if (!my_hts221_init()) {

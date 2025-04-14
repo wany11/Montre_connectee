@@ -5,7 +5,7 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/rtc.h>
 #include <zephyr/drivers/i2c.h>
-#include <zephyr/sys/util.h>  // Inclure explicitement pour bin2bcd et bcd2bin
+#include <zephyr/sys/util.h>
 
 static const struct device *rtc_dev;
 static const struct device *i2c_dev;
