@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "kernel.h": "c",
+        "sensor.h": "c",
+        "util.h": "c",
+        "device.h": "c",
+        "debug.h": "c",
+        "sensors.h": "c",
+        "timsec.h": "c",
+        "button.h": "c",
+        "rtc.h": "c",
+        "touch_screen.h": "c",
+        "ui.h": "c",
+        "sensortimers.h": "c"
+    }
+}
